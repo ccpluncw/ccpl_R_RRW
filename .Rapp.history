@@ -1,0 +1,34 @@
+library(chutils)
+ch.updateRpackage (packageName = "RRW")
+?assessRRWfit
+ch.updateRpackage (packageName = "RRW")
+?assessRRWfit
+ch.updateRpackage (packageName = "RRW")
+ch.updateRpackage (packageName = "RRW")
+?assessRRWfit
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")
+document()
+?assessRRWfit
+?assessRRWfit
+library(RRQ)
+library(RRW)
+?assessRRWfit
+wd <- getwd()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")#
+use_package("RRW") # Defaults to imports#
+setwd(wd)
+wd <- getwd()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")#
+use_package("RRW") # Defaults to imports#
+setwd(wd)
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")#
+use_package("chutils") # Defaults to imports#
+setwd(wd)
+ch.updateRpackage (packageName = "RRW")
+library(chutils)
+install("chutils")#
+library("chutils")
+?ch.rbind
+?assessRRWfit
+ch.updateRpackage (packageName = "RRW")
