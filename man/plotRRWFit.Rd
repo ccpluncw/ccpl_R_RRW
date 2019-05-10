@@ -5,11 +5,11 @@
 \title{This function plots the fitted RRW simulation as a function of the empirical data.}
 \usage{
 plotRRWFit(data, dataRtCol, dataPhitCol, rtFitCol, pHitFitCol, correctCol,
-  overlapCol, startBiasEffectCol = NULL, valueChangeEffectCol = NULL,
-  plotFilename, twoPlotsPerPage = TRUE)
+  overlapCol, condCol = NULL, plotFilename, twoPlotsPerPage = TRUE,
+  yMinMixRT = NULL)
 }
 \arguments{
-\item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contain a column specifying a condition that will influence either the startpoint or the value of the trials.}
+\item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
 
 \item{dataRtCol}{A string that identifies the name of the column in data that contains the RTs for the specific overlap/correct/condition combination. Default is "rt"}
 
@@ -23,13 +23,13 @@ plotRRWFit(data, dataRtCol, dataPhitCol, rtFitCol, pHitFitCol, correctCol,
 
 \item{overlapCol}{A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"}
 
-\item{startBiasEffectCol}{A string that identifies the name of the column in data that identifies the conditions that will affect the position of the start point.  This column should be effect coded, because the values contained in this column will be multiplied by the value of startBiasEffect (and then added to s) to get the start point of the RRW.}
-
-\item{valueChangeEffectCol}{A string that identifies the name of the column in data that identifies the conditions that will affect the change of overlap (value change).  This column should be effect coded, because the values contained in this column will be multiplied by the value of valueChangeEffect (and then added to overlap) to get the overlap input in the RRW. This change is assumed to be constant across the entire overlap sequence (from 0-1).}
+\item{condCol}{A string that identifies the name of the column in data that identifies the conditions that will be plotted as separate lines. DEFAULT = NULL}
 
 \item{plotFilename}{A string that identifies the name of file (.pdf) in which the plot will be saved. The default is NULL, whereby the plot will not be saved.}
 
 \item{twoPlotsPerPage}{A boolean that identifies whether to print two plots per page.  DEFAULT = TRUE.}
+
+\item{yMinMixRT}{A vector of 2 numbers that identifies the c(min, max) for the y-axis of the RT graph. If not entered, then the function will calculate a pretty min and max. DEFAULT = NULL.}
 }
 \value{
 .

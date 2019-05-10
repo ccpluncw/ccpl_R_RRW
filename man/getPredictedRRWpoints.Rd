@@ -4,17 +4,14 @@
 \alias{getPredictedRRWpoints}
 \title{This function simulates the RRW for a single set of parameters across all values of overlap.}
 \usage{
-getPredictedRRWpoints(data, b, RWkeepColumns, mergeByDataColumns,
-  mergeByRWColumns, dataRtCol, RwSamplesCol, startValue = 0,
-  noiseSD = 0, decayAsymptote = 0.2, decayBeta = 0,
-  startBiasEffect = NULL, startBiasEffectCol = NULL,
-  valueChangeEffect = NULL, valueChangeEffectCol = NULL, loops = 200,
-  progress = F)
+getPredictedRRWpoints(data, RWkeepColumns, mergeByDataColumns,
+  mergeByRWColumns, dataRtCol, RwSamplesCol, dataOverlapCol, b,
+  startValue = 0, noiseSD = 0, decayBeta = 0, decayAsymptote = 0.2,
+  valueChange = 0, bCols = NULL, sCols = NULL, nSDCols = NULL,
+  dbCols = NULL, daCols = NULL, vcCols = NULL, loops = 200)
 }
 \arguments{
-\item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contain a column specifying a condition that will influence either the startpoint or the value of the trials.}
-
-\item{b}{A number specifying the boundary distance from a 0 startpoint. This value is specific to the RRW simulation and has no default value}
+\item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
 
 \item{RWkeepColumns}{A vector of strings that specify the columns of the RRW simulated data that should be kept when the simulated dataframe is merged with the empirical dataframe.}
 
@@ -26,25 +23,33 @@ getPredictedRRWpoints(data, b, RWkeepColumns, mergeByDataColumns,
 
 \item{RwSamplesCol}{A string that identifies the name of the column in the RRW simulations that contains the summary of the samples that you want to use as a simulation for RT.  The possible columns are: "Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile).  The default is "Q50" because the median is more robust than the mean.}
 
-\item{startValue}{A signed number between -1 and 1 that indicates the position of the start point as a proportion of the boundary value.  startValue = 0 is the default and represents an unbiased start point.}
+\item{dataOverlapCol}{A string that identifies the name of the column in data that contains the distributional overlaps for each row.}
 
-\item{noiseSD}{A positive number representing the SD of the noise distribution.  The noise distribution is N(0,nSD) and is added to the value of every step. noiseSD = 0 is the default and represents no noise being added to each step.}
+\item{b}{A vector of number(s) specifying the boundary distance from a 0 startpoint. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of b. The column names must be specified in the "bCols" argument. b is specific to the RRW simulation and has no default value}
 
-\item{decayAsymptote}{A positive number representing the asymptote value in the Information Accrual Bias (IAB). decayAsymptote = 0.2 is the default.}
+\item{startValue}{A vector of signed number(s) between -1 and 1 that indicates the position of the start point as a proportion of the boundary value.   If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of startValue. The column names must be specified in the "sCols" argument. startValue = 0 is the default and represents an unbiased start point.}
 
-\item{decayBeta}{A signed number representing the beta value in the Information Accrual Bias (IAB). decayBeta = 0 is the default and represents no IAB.}
+\item{noiseSD}{A vector of positive number(s) representing the SD of the noise distribution.  The noise distribution is N(0,nSD) and is added to the value of every step.  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of noiseSD. The column names must be specified in the "nSDCols" argument. noiseSD = 0 is the default and represents no noise being added to each step.}
 
-\item{startBiasEffect}{A signed number between -1 and 1 that indicates the position of the start point as a proportion of the boundary value.  The startBiasEffect is a constant that is added to s (the start point) as a function of the values contained in the startBiasEffectCol. The default is NULL because there is no startBiasEffect unless one includes a startBiasEffectCol.}
+\item{decayBeta}{A vector of signed number(s) representing the beta value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayBeta. The column names must be specified in the "dbCols" argument. decayBeta = 0 is the default and represents no IAB.}
 
-\item{startBiasEffectCol}{A string that identifies the name of the column in data that identifies the conditions that will affect the position of the start point.  This column should be effect coded, because the values contained in this column will be multiplied by the value of startBiasEffect (and then added to s) to get the start point of the RRW.}
+\item{decayAsymptote}{A vector of positive number(s) representing the asymptote value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayAsymptote. The column names must be specified in the "daCols" argument. decayAsymptote = 0.2 is the default.}
 
-\item{valueChangeEffect}{A signed number between that indicates the change of overlap that one predicts as a function of the values contained in the valueChangeEffectCol. The default is NULL because there is no valueChangeEffect unless one includes a valueChangeEffectCol.}
+\item{valueChange}{A vector of signed number(s) that indicates the change of overlap that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of valueChange. The column names must be specified in the "vcCols" argument. The default is 0 because there is no valueChangeEffect.}
 
-\item{valueChangeEffectCol}{A string that identifies the name of the column in data that identifies the conditions that will affect the change of overlap (value change).  This column should be effect coded, because the values contained in this column will be multiplied by the value of valueChangeEffect (and then added to overlap) to get the overlap input in the RRW. This change is assumed to be constant across the entire overlap sequence (from 0-1).}
+\item{bCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of boundary (b).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of b.}
+
+\item{sCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of startValue (startValue).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of startValue.}
+
+\item{nSDCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of noiseSD (noiseSD).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of noiseSD.}
+
+\item{dbCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decayBeta (decayBeta).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayBeta.}
+
+\item{daCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decay asymptote (decayAsymptote).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayAsymptote.}
+
+\item{vcCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (valueChange).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.}
 
 \item{loops}{A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.}
-
-\item{progress}{TRUE or FALSE that specifies whether to present a progress bar.  Default is FALSE.}
 }
 \value{
 A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
@@ -53,7 +58,7 @@ A dataframe that contains the "data" plus the fitted values from the model ("Q25
 This function simulates the RRW for a single set of parameters across all values of overlap and then attaches this simulation to the empirical RT and error data.  This simulation's fit will be assessed by the optimization program (using assessRRWfit()) and then the parameters will be adjested.
 }
 \examples{
-getPredictedRRWpoints (data, b=14, RWkeepColumns = c("overlap", "Q50", "pCross", "correct"), mergeByDataColumns = c("overlap", "correct"), dataRtCol = "rt", RwSamplesCol = "Q50", s=0.1, loops = 400)
+getPredictedRRWpoints (data, RWkeepColumns = c("overlap", "Q50", "pCross", "correct"), mergeByDataColumns = c("overlap", "correct"), dataRtCol = "rt", RwSamplesCol = "Q50", dataOverlapCol= "overlap", b=14, s=0.1, loops = 400)
 }
 \keyword{RRW}
 \keyword{get}

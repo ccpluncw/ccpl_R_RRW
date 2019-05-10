@@ -20,7 +20,7 @@ getMomentsOfDRM <- function(CDFps, values) {
     tryCatch ({
       tmp.drm <- drc::drm(CDFps ~ values, fct = LL2.3(), robust='mean')
       }, error = function(e) {
-          print(paste("drm function did not fit - trying alternate method ..."))
+#          print(paste("drm function did not fit - trying alternate method ..."))
     })
   }
   if (is.null(tmp.drm)) {
@@ -30,7 +30,7 @@ getMomentsOfDRM <- function(CDFps, values) {
     tryCatch ({
       df.out <- getMomentsOfPDF(pdf, values[2:length(values)])
       }, error = function(e) {
-          print(paste("getMomentsOfPDF - trying alternate method ..."))
+#          print(paste("getMomentsOfPDF - trying alternate method ..."))
     })
     if(is.null(df.out)) {
       df.out$mean <- NA
@@ -54,7 +54,7 @@ getMomentsOfDRM <- function(CDFps, values) {
       tryCatch ({
         df.out <- getMomentsOfPDF(pdf, values[2:length(values)])
         }, error = function(e) {
-            print(paste("getMomentsOfPDF - trying alternate method ..."))
+#            print(paste("getMomentsOfPDF - trying alternate method ..."))
       })
       if(is.null(df.out)) {
         df.out$mean <- NA
