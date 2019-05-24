@@ -36,7 +36,6 @@ assessRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL
 
   #if the parameters from the grid search are valid, see how well they fit the data
   if(validParams == TRUE) {
-
     #get the keep and merge columns
     #the RW columns are defined by the program. The column used to compare with the data RT is a choice of the user.
     RWkeepColumns <- c("overlap", RwSamplesCol, "pCross", "correct")

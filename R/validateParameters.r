@@ -32,7 +32,7 @@ validateParameters <- function(data, b, s, nSD, db, da, vc, bCols, sCols, nSDCol
   dataRunCols <- c(dataOverlapCol, bCols, sCols, nSDCols, dbCols, daCols, vcCols)
 
   #extract the unique information
-  data.tmp <- unique(data[,dataRunCols])
+  data.tmp <- unique(data[,dataRunCols, drop=F])
   data.n <- nrow(data.tmp)
 
   ovIn <- NULL

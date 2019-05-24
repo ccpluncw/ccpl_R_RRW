@@ -1,6 +1,6 @@
-#' This function generates an RRW simulation, fits it to empirical data, and and outputs the fit.
+#' This function runs the RRW simulation "numSimsToAverage" number of times, each time it fits the simulation to empirical data, and then it averages the fits and outputs the average fit.
 #'
-#' Function that generates an RRW simulation, fits it to empirical data, and outputs the fit.  It is generally run after the assessRRWfit() is fit with an optimation routine (e.g., smartGridSearch()) to identify the optimal parameters.  The optimation routine should output the parameters that generate the best fit, and those parameters should be input into plotRRWfit().  This takes the same parameters as assessRRWfit().
+#' Function that runs the RRW simulation "numSimsToAverage" number of times, each time it fits the simulation to empirical data, and then it averages the fits and outputs the average fit.  It is generally run after the assessRRWfit() is fit with an optimation routine (e.g., smartGridSearch()) to identify the optimal parameters.  The optimation routine should output the parameters that generate the best fit, and those parameters should be input into plotRRWfit().  This takes the same parameters as assessRRWfit().
 #'
 #'
 #'
@@ -23,7 +23,9 @@
 #' @param dataPhitCol A string that identifies the name of the column in data that contains the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pHit"
 #' @param dataCorrectCol A string that identifies the name of the column in data that identifies whether the trials were correct (TRUE) or incorrect (FALSE). The default is "correct"
 #' @param loopsPerRWstep A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
+#' @param numSimsToAverage A number specifying how many times the simulation should be run. When it is run multiple times, the function will calculate the average simulated RT and pHit for each row, and the average and sd r2 and BIC for the set of runs. Default is 10.
 #' @param sinkFilename A string that identifies the name of file (.txt) in which the fit statistics will be saved. The default is NULL, whereby the fit statistics will not be saved.
+#' @param pars.n A number specifying the number of free parameters in the model.  Use this when you are fixing the values of some parameters, but those fixed values are not the default values of the parameters.  Otherwise, the number of free parameters will be automatically caluculated. Default is NULL (automatically calculate).
 #'
 #' @return A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
 #'
@@ -31,7 +33,7 @@
 #' @export
 #' @examples getRRWfit (data, b=14, s=0.1, loopsPerRWstep = 2000, sinkFilename = "outStats.txt")
 
-getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, sinkFilename = NULL, pars.n = NULL) {
+getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, numSimsToAverage = 10, sinkFilename = NULL, pars.n = NULL) {
 
   #the RW columns are defined by the program. The column used to compare with the data RT is a choice of the user.
   RWkeepColumns <- c("overlap", RwSamplesCol, "pCross", "correct")
@@ -43,25 +45,84 @@ getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, s
   mergeByDataColumns <- c(mergeByDataColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols)
   mergeByRWColumns <- c(mergeByRWColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols)
 
-  df.fitted <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, bCols = bCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, loops = loopsPerRWstep)
-
-  Q50.lm <- lm(df.fitted[[dataRtCol]]~df.fitted[[RwSamplesCol]])
-
-  #caluculate (1-r2)
-  pCor.rss <- min.r2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
-  Q50.rss <- min.r2(df.fitted$rtFit,df.fitted[[dataRtCol]])
-  out.rss <- (Q50.rss + pCor.rss)/2
-
-  #calculate BIC
   if(is.null(pars.n)) {
     pars.n = 1 + length(b) + ifelse(length(s)==1 & s[1]==0, 0, length(s)) + ifelse(length(nSD)==1 & nSD[1]==0, 0, length(nSD)) + ifelse(length(db)[1]==1 & db==0, 0, length(db)) + ifelse(length(da)[1]==1 & da==0.2, 0, length(da)) + ifelse(length(vc)==1 & vc[1]==0, 0, length(vc))
   }
+
+  df.fitted <- NULL
+  out.rss <- NULL
+  out.BIC <- NULL
+  simPhitCols <- NULL
+  simSMPSCols <- NULL
+  simRTCols <- NULL
+  for (i in 1:numSimsToAverage) {
+
+    cat(i," of ", numSimsToAverage, "\n")
+
+    df.tmp <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, bCols = bCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, loops = loopsPerRWstep)
+
+    Q50.lm <- lm(df.tmp[[dataRtCol]]~df.tmp[[RwSamplesCol]])
+
+    #caluculate (1-r2)
+    pCor.rss <- min.r2(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol])
+    Q50.rss <- min.r2(df.tmp$rtFit,df.tmp[[dataRtCol]])
+    #add average r2 to the array of average r2s
+    out.rss[i] <- (Q50.rss + pCor.rss)/2
+
+    #calculate BIC
+    pCor.BIC <- chutils::ch.BIC(df.tmp[df.tmp$correct == TRUE, dataPhitCol], df.tmp[df.tmp$correct == TRUE, "pCross"], pars.n, standardize = TRUE)
+    Q50.BIC <- chutils::ch.BIC(df.tmp[[dataRtCol]], df.tmp$rtFit, pars.n, standardize = TRUE)
+    #add average BIC to the array of average BICs
+    out.BIC[i] <- (Q50.BIC + pCor.BIC)/2
+
+    #rename the predicted columns to include the run number at the end
+    simPhitCols <- c(simPhitCols, paste("pCross",i,sep=""))
+    simSMPSCols <- c(simSMPSCols, paste(RwSamplesCol,i,sep=""))
+    simRTCols <- c(simRTCols, paste("rtFit",i,sep=""))
+
+    #rename columns
+    colnames(df.tmp)[colnames(df.tmp)=="pCross"] <- paste("pCross",i,sep="")
+    colnames(df.tmp)[colnames(df.tmp)==RwSamplesCol] <- paste(RwSamplesCol,i,sep="")
+    colnames(df.tmp)[colnames(df.tmp)=="rtFit"] <- paste("rtFit",i,sep="")
+
+    #merge the simulated data frame predictions, with the others
+    if(is.null(df.fitted)) {
+      df.fitted <- df.tmp
+    } else {
+      df.fitted <- cbind(df.fitted, df.tmp[,c(simPhitCols[i],simSMPSCols[i],simRTCols[i])])
+    }
+  }
+
+
+  #get average of simulations
+  df.fitted$pCross <- rowMeans(df.fitted[,simPhitCols], na.rm = TRUE)
+  df.fitted[[RwSamplesCol]] <- rowMeans(df.fitted[,simSMPSCols], na.rm = TRUE)
+
+  #rescale so samples fits rts
+  Q50.lm <- lm(df.fitted[[dataRtCol]]~df.fitted[[RwSamplesCol]])
+  df.fitted$rtFit = df.fitted[[RwSamplesCol]]*coef(Q50.lm)[2]+coef(Q50.lm)[1]
+
+  #caluculate (1-r2) on the average of fits
+  pCor.rss <- min.r2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
+  Q50.rss <- min.r2(df.fitted$rtFit,df.fitted[[dataRtCol]])
+  #add average r2 to the array of average r2s
+  out.rss.final <- (Q50.rss + pCor.rss)/2
+
+  #calculate BIC on the average of fits
   pCor.BIC <- chutils::ch.BIC(df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted[df.fitted$correct == TRUE, "pCross"], pars.n, standardize = TRUE)
   Q50.BIC <- chutils::ch.BIC(df.fitted[[dataRtCol]], df.fitted$rtFit, pars.n, standardize = TRUE)
-  out.BIC <- (Q50.BIC + pCor.BIC)/2
+  #add average BIC to the array of average BICs
+  out.BIC.final <- (Q50.BIC + pCor.BIC)/2
+
+  #get mean and sd of fit stats of the individual runs
+  m.out.rss <- mean(out.rss)
+  sd.out.rss <- sd(out.rss)
+  m.out.BIC <- mean(out.BIC)
+  sd.out.BIC <- sd(out.BIC)
 
   if (!is.null(sinkFilename)) {
     sink(sinkFilename)
+      cat("\n\n Number of Simulations Run = ", numSimsToAverage, "\n\n")
       cat("\n\n RTb = ", coef(Q50.lm)[2], "\n\n")
       cat(" RTi (Ter) = ", coef(Q50.lm)[1], "\n\n")
 
@@ -83,15 +144,15 @@ getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, s
       if(!is.null(vcCols)) cat(" ValueChange Effect Codes = ", vcCols, "\n")
       cat(" ValueChange = ", vc, "\n\n")
 
-      cat("\n\n RT R Square = ", Q50.rss, "\n")
-      cat(" pHit R Square = ", pCor.rss, "\n")
-      cat(" Average R Square = ", out.rss, "\n\n")
+      cat("\n\n Average R Square = ", m.out.rss, "\n")
+      cat(" SD R Square = ", sd.out.rss, "\n")
+      cat(" Final R Square = ", out.rss.final, "\n\n")
 
       cat("\n\n WARNING: BIC does not weight p(Hit) and RT fits equally because the residules are inherently different sizes.  So BIC is a sub-optimal measure of model fit.\n")
       cat("\n N Parameters = ", pars.n, "\n")
-      cat(" RT BIC = ", Q50.BIC, "\n")
-      cat(" pHit BIC = ", pCor.BIC, "\n")
-      cat(" Average BIC = ", out.BIC, "\n\n")
+      cat(" Average BIC = ", m.out.BIC, "\n")
+      cat(" SD BIC = ", sd.out.BIC, "\n")
+      cat(" Final BIC = ", out.BIC.final, "\n\n")
     sink(NULL)
   }
 

@@ -36,7 +36,7 @@ getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, merg
     effectCols <- c(bCols, sCols, nSDCols, dbCols, daCols, vcCols)
 
     #extract the unique information
-    data.tmp <- unique(data[,dataRunCols])
+    data.tmp <- unique(data[,dataRunCols, drop=F])
 
     data.n <- nrow(data.tmp)
     df.out <- NULL
@@ -56,7 +56,7 @@ getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, merg
       df.tmp <- getMomentsOfRRW(overlap = ovIn, b = bIn, startValue = sIn, noiseSD = nSDIn, decayAsymptote = daIn, decayBeta = dbIn, loops=loops)
 
       #add the effect codes onto the dataframe containing the simulated data.  You will need that for merging with the actual data
-      df.tmp <- cbind(df.tmp, data.tmp[i,effectCols])
+      df.tmp <- cbind(df.tmp, data.tmp[i,effectCols, drop=F])
       df.tmp$overlap <- data.tmp[i,dataOverlapCol]
 
       #append each simulated row to the output dataframe
