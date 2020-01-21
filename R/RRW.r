@@ -1,7 +1,6 @@
 #' This function simulates the RRW to build the response distribution.
 #'
 #' This function simulates the RRW to build the response distribution.  It does so incrementally, one numSamples at a time.  Specifically, for a specific overlap and all the usual parameters of the RRW model, it will assess the probability of crossing the boundary given a specific number of samples ("samples"). The function pCrossBoundaryDist() calls RRW multiple times to build the entire distribution for a specific overlap and all the usual parameters.
-#'
 #' @param overlap A number between 0-1 representing a single distributional overlap.
 #' @param boundary A number specifying the boundary distance from a 0 startpoint. This value is specific to the RRW simulation and has no default value
 #' @param samples The number of samples in this particular run.  Generally, this will be input from 1 up in steps of 1 until all of the samples cross a boundary.
@@ -10,7 +9,6 @@
 #' @param decayAsymptote A positive number representing the asymptote value in the Information Accrual Bias (IAB). decayAsymptote = 0.2 is the default.
 #' @param decayBeta A signed number representing the beta value in the Information Accrual Bias (IAB). decayBeta = 0 is the default and represents no IAB.
 #' @param loops A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
-#'
 #' @return A dataframe that contains the boundary; samples; overlap; the p(D1 > D2) derived from overlap; pCrossA the probability of the RRW with this number of samples crossing the possitive boundary; pCrossB the probability of the RRW with this number of samples crossing the negative boundary.
 #' @keywords RRW random walk simulation moments overlap
 #' @export

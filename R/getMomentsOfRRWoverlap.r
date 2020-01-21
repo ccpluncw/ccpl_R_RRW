@@ -1,8 +1,6 @@
 #' This function simulates the RRW for a single set of parameters across all values of overlap.
 #'
 #' This function simulates the RRW for a single set of parameters across all values of overlap.
-#'
-#'
 #' @param overlapSeq A vector of numbers between 0-1 representing distributional overlaps.
 #' @param boundary A number specifying the boundary distance from a 0 startpoint. This value is specific to the RRW simulation and has no default value
 #' @param correctBoundary Either 1 or -1.  If correctBoundary = 1, then the positive boundary is the boundary for a correct response.  If correctBoundary = -1, then the negative boundary is the boundary for a correct response.
@@ -13,7 +11,6 @@
 #' @param decayBeta A signed number representing the beta value in the Information Accrual Bias (IAB). decayBeta = 0 is the default and represents no IAB.
 #' @param loops A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
 #' @param progress TRUE or FALSE that specifies whether to present a progress bar.  Default is FALSE.
-#'
 #' @return A dataframe that contains the moments of the simmulated values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the probability of crossing each boundary); correct (TRUE or FALSE)), along with the parameters of the model.
 #' @keywords RRW random walk simulation moments overlap
 #' @export

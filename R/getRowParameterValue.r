@@ -1,15 +1,10 @@
 #' This function outputs the parameter value for a specific row of the data.
 #'
 #' This function outputs the parameter value for a specific row of the data. Because models are effect coded, each parameter value for the data row is often the sum of the effects.  This function calculates and outputs that sum.
-#'
-#'
-#'
 #' @param data.row This is a single row of the  dataframe that  contains (at least) the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.
 #' @param parCol This is a vector of strings that identify the names of the columns in data that contain the effect codes for the specific parameter entered here. Default  = NULL (e.g., no effect codes for this parameter)
 #' @param parVec A vector of number(s) specifying the values for this specific paramter.
-#'
 #' @return The value(s) of the paramter for the condition specified in data.row.
-#'
 #' @keywords RRW random walk parameters effect codes
 #' @export
 #' @examples getRowParameterValue (data[1,], "boundaryCols", b)

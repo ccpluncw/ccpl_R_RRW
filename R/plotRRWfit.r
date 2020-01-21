@@ -1,9 +1,6 @@
 #' This function plots the fitted RRW simulation as a function of the empirical data.
 #'
 #' Function plots the fitted RRW simulation as a function of the empirical data.  It is generally run after the getRRWfit().
-#'
-#'
-#'
 #' @param data This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.
 #' @param dataRtCol A string that identifies the name of the column in data that contains the RTs for the specific overlap/correct/condition combination. Default is "rt"
 #' @param dataPhitCol A string that identifies the name of the column in data that contains the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pHit"
@@ -15,9 +12,7 @@
 #' @param plotFilename A string that identifies the name of file (.pdf) in which the plot will be saved. The default is NULL, whereby the plot will not be saved.
 #' @param twoPlotsPerPage A boolean that identifies whether to print two plots per page.  DEFAULT = TRUE.
 #' @param yMinMixRT A vector of 2 numbers that identifies the c(min, max) for the y-axis of the RT graph. If not entered, then the function will calculate a pretty min and max. DEFAULT = NULL.
-#'
 #' @return .
-#'
 #' @keywords RRW random walk plot output fit
 #' @export
 #' @examples plotRRWFit (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")

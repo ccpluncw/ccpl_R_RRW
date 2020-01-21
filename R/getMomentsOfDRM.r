@@ -1,11 +1,8 @@
 #' This function fits a  3 parameter log-Logistic to a Cumulative Distribution Function, and returns the moments of the function.
 #'
 #' This function fits a  3 parameter log-Logistic to a Cumulative Distribution Function, and returns the moments of the function.
-#'
-#'
 #' @param CDFps A vector containing the proportions of the CDF.
 #' @param values A vector containing the values (x-axis) of the CDF.
-#'
 #' @return A dataframe that contains the moments of the simmulated values from the CDF ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the probability of crossing the boundary)
 #' @keywords DRM CDF moments values
 #' @export

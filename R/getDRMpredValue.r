@@ -1,11 +1,8 @@
 #' This function gets the predicted value of the three parameter log logisistic function returned by drc::drm().
 #'
 #' This function gets the predicted value of the three parameter log logisistic function returned by drc::drm().
-#'
-#'
 #' @param val A number that is the "x" value for which you want the "y" value returned.
 #' @param drmModel The DRM model returned by drc::drm().
-#'
 #' @return The "Y" value that corresponds to the "x" value of the "val" parameter
 #' @keywords DRM log logistic
 #' @export

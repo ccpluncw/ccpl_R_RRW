@@ -1,8 +1,6 @@
 #' This function simulates the RRW for a single set of parameters across all values of overlap.
 #'
 #' This function simulates the RRW for a single set of parameters across all values of overlap and then attaches this simulation to the empirical RT and error data.  This simulation's fit will be assessed by the optimization program (using assessRRWfit()) and then the parameters will be adjested.
-#'
-#'
 #' @param data This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.
 #' @param RWkeepColumns A vector of strings that specify the columns of the RRW simulated data that should be kept when the simulated dataframe is merged with the empirical dataframe.
 #' @param mergeByDataColumns A vector of strings that specify the columns of the empirical data that should be used in the "by.x" option of the merge() function when the simulated dataframe is merged with the empirical dataframe.
@@ -23,7 +21,6 @@
 #' @param daCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decay asymptote (decayAsymptote).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayAsymptote.
 #' @param vcCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (valueChange).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
 #' @param loops A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
-#'
 #' @return A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
 #' @keywords RRW random walk simulation get predicted
 #' @export
@@ -65,6 +62,7 @@ getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, merg
 
     #combine the simulated data with the empirical data
     df.out1 <- df.out[,RWkeepColumns]
+
     df.out2 <- merge(df.out1, data, by.x = mergeByRWColumns, by.y=mergeByDataColumns)
 
     #scale the RRW samples to fit the empirical RT data
