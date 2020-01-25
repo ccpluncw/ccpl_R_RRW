@@ -79,9 +79,9 @@ getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, s
       if(!is.null(vcCols)) cat(" ValueChange Effect Codes = ", vcCols, "\n")
       cat(" ValueChange = ", vc, "\n\n")
 
-      cat("\n\n RT R Square = ", Q50.rss, "\n")
-      cat(" pHit R Square = ", pCor.rss, "\n")
-      cat(" Average R Square = ", out.rss, "\n\n")
+      cat("\n\n RT R Square = ", 1 - Q50.rss, "\n")
+      cat(" pHit R Square = ", 1 - pCor.rss, "\n")
+      cat(" Average R Square = ", 1 - out.rss, "\n\n")
 
       cat("\n\n WARNING: BIC does not weight p(Hit) and RT fits equally because the residules are inherently different sizes.  So BIC is a sub-optimal measure of model fit.\n")
       cat("\n N Parameters = ", pars.n, "\n")
