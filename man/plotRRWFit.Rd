@@ -4,9 +4,10 @@
 \alias{plotRRWFit}
 \title{This function plots the fitted RRW simulation as a function of the empirical data.}
 \usage{
-plotRRWFit(data, dataRtCol, dataPhitCol, rtFitCol, pHitFitCol, correctCol,
-  overlapCol, condCol = NULL, plotFilename, twoPlotsPerPage = TRUE,
-  yMinMixRT = NULL)
+plotRRWFit(data, dataRtCol = "rt", dataPhitCol = "pHit",
+  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct",
+  overlapCol = "overlap", condCol = NULL, plotFilename = NULL,
+  twoPlotsPerPage = TRUE, yMinMixRT = NULL)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
@@ -15,9 +16,9 @@ plotRRWFit(data, dataRtCol, dataPhitCol, rtFitCol, pHitFitCol, correctCol,
 
 \item{dataPhitCol}{A string that identifies the name of the column in data that contains the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pHit"}
 
-\item{rtFitCol}{A string that identifies the name of the column in data that contains the RRW fit of the RTs for the specific overlap/correct/condition combination. Default is "rt"}
+\item{rtFitCol}{A string that identifies the name of the column in data that contains the RRW fit of the RTs for the specific overlap/correct/condition combination. Default is "rtFit"}
 
-\item{pHitFitCol}{A string that identifies the name of the column in data that contains the RRW fit of the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pHit"}
+\item{pHitFitCol}{A string that identifies the name of the column in data that contains the RRW fit of the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pCross"}
 
 \item{correctCol}{A string that identifies the name of the column in data that identifies whether the trials were correct (TRUE) or incorrect (FALSE). The default is "correct"}
 

@@ -1,34 +1,39 @@
 library(chutils)
-ch.updateRpackage (packageName = "RRW")
-?assessRRWfit
-ch.updateRpackage (packageName = "RRW")
-?assessRRWfit
+ch.updateRpackage (packageName = "chMorals")
+ch.updateRpackage (packageName = "chMorals")
 ch.updateRpackage (packageName = "RRW")
 ch.updateRpackage (packageName = "RRW")
-?assessRRWfit
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")
-document()
-?assessRRWfit
-?assessRRWfit
-library(RRQ)
-library(RRW)
-?assessRRWfit
-wd <- getwd()#
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")#
-use_package("RRW") # Defaults to imports#
-setwd(wd)
-wd <- getwd()#
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")#
-use_package("RRW") # Defaults to imports#
-setwd(wd)
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")#
-use_package("chutils") # Defaults to imports#
-setwd(wd)
+inputDataFile <- "Apr_19_2020_16-03_deathMethod_overallChoice FitResults.txt"
+df.fitted <-read.table(inputDataFile, header=T, sep="\t")
+head(df.fitted)
+inputDataFile <- "Apr_19_2020_16-03_deathMethod_overallChoice Fitted.txt"
+df.fitted <-read.table(inputDataFile, header=T, sep="\t")
+head(df.fitted)
+getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = FALSE)
+unloadNamespace("RRW")
 ch.updateRpackage (packageName = "RRW")
-library(chutils)
+getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = FALSE)
+getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = T)
+1 -getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = T)
+unloadNamespace("RRW")
+ch.updateRpackage (packageName = "RRW")
+ch.updateRpackage (packageName = "RRW")
+log(.03)
+log(.02)
+unloadNamespace("RRW")
+ch.updateRpackage (packageName = "RRW")
+unloadNamespace("RRW")
+ch.updateRpackage (packageName = "RRW")
+ch.updateRpackage (packageName = "RRW")
+unloadNamespace("chutils")
+wd1 <- getwd()#
+library(devtools)#
+library(roxygen2)#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/chutils")#
+document()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages")#
 install("chutils")#
-library("chutils")
-?ch.rbind
-?assessRRWfit
+library("chutils")#
+setwd(wd1)
+unloadNamespace("RRW")
 ch.updateRpackage (packageName = "RRW")

@@ -22,12 +22,14 @@
 #' @param loopsPerRWstep A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
 #' @param sinkFilename A string that identifies the name of file (.txt) in which the fit statistics will be saved. The default is NULL, whereby the fit statistics will not be saved.
 #' @param pars.n The number of free parameters in the model. The default is NULL, whereby the function will calculate the number of free parameters automatically.
+#' @param equalizeRTandPhit A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the influence of the pHit and RT is equalized in the minimization statistic. If it is set to FALSE, then the the minimazation statistic is calculated as usual. DEFAULT = FALSE.
+#''
 #' @return A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
 #' @keywords RRW random walk plot output fit
 #' @export
 #' @examples getRRWfit (data, b=14, s=0.1, loopsPerRWstep = 2000, sinkFilename = "outStats.txt")
 
-getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, sinkFilename = NULL, pars.n = NULL) {
+getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, sinkFilename = NULL, pars.n = NULL, equalizeRTandPhit = FALSE) {
 
   #the RW columns are defined by the program. The column used to compare with the data RT is a choice of the user.
   RWkeepColumns <- c("overlap", RwSamplesCol, "pCross", "correct")
@@ -44,21 +46,30 @@ getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, s
   Q50.lm <- lm(df.fitted[[dataRtCol]]~df.fitted[[RwSamplesCol]])
 
   #caluculate (1-r2)
-  pCor.rss <- min.r2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
-  Q50.rss <- min.r2(df.fitted$rtFit,df.fitted[[dataRtCol]])
-  out.rss <- (Q50.rss + pCor.rss)/2
+  #get the  minimization variable (1-r2) for the pHit
+  pCor.rss <- getMinR2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], na.rm=T)
+
+  #and RT.
+  Q50.rss <- getMinR2(df.fitted$rtFit,df.fitted[[dataRtCol]], na.rm=T)
+
+  #combine (1-r2) for pHit and RT
+  ave.rss <- (Q50.rss + pCor.rss)/2
+
+  out.rss <- getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], equalizeRTandPhit = equalizeRTandPhit)
 
   #calculate BIC
   if(is.null(pars.n)) {
     pars.n = 1 + length(b) + ifelse(length(s)==1 & s[1]==0, 0, length(s)) + ifelse(length(nSD)==1 & nSD[1]==0, 0, length(nSD)) + ifelse(length(db)[1]==1 & db==0, 0, length(db)) + ifelse(length(da)[1]==1 & da==0.2, 0, length(da)) + ifelse(length(vc)==1 & vc[1]==0, 0, length(vc))
   }
-  pCor.BIC <- chutils::ch.BIC(df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted[df.fitted$correct == TRUE, "pCross"], pars.n, standardize = TRUE)
-  Q50.BIC <- chutils::ch.BIC(df.fitted[[dataRtCol]], df.fitted$rtFit, pars.n, standardize = TRUE)
-  out.BIC <- (Q50.BIC + pCor.BIC)/2
+  out.BIC <- getICRRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
+  out.AIC <- getICRRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
 
   if (!is.null(sinkFilename)) {
     sink(sinkFilename)
-      cat("\n\n RTb = ", coef(Q50.lm)[2], "\n\n")
+      cat("\n\n ******** Simulation Epoch Transformation ******** \n\n")
+      cat(" RTb = ", coef(Q50.lm)[2], "\n\n")
+
+      cat("\n\n ******** Parameter Values ******** \n\n")
       cat(" RTi (Ter) = ", coef(Q50.lm)[1], "\n\n")
 
       if(!is.null(bCols)) cat(" Boundary Effect Codes = ", bCols, "\n")
@@ -79,15 +90,17 @@ getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, s
       if(!is.null(vcCols)) cat(" ValueChange Effect Codes = ", vcCols, "\n")
       cat(" ValueChange = ", vc, "\n\n")
 
-      cat("\n\n RT R Square = ", 1 - Q50.rss, "\n")
+      cat("\n\n ******** pHit and RT R Square ******** \n\n")
       cat(" pHit R Square = ", 1 - pCor.rss, "\n")
-      cat(" Average R Square = ", 1 - out.rss, "\n\n")
+      cat(" RT R Square = ", 1 - Q50.rss, "\n")
+      cat(" Average R Square = ", 1 - ave.rss, "\n")
 
-      cat("\n\n WARNING: BIC does not weight p(Hit) and RT fits equally because the residules are inherently different sizes.  So BIC is a sub-optimal measure of model fit.\n")
-      cat("\n N Parameters = ", pars.n, "\n")
-      cat(" RT BIC = ", Q50.BIC, "\n")
-      cat(" pHit BIC = ", pCor.BIC, "\n")
-      cat(" Average BIC = ", out.BIC, "\n\n")
+      cat("\n\n ******** Model Fit Statistics ******** \n\n")
+      cat(" N Parameters = ", pars.n, "\n")
+      cat(" Overall R Square = ", 1 - out.rss, "\n")
+      cat(" BIC = ", out.BIC, "\n")
+      cat(" AIC = ", out.AIC, "\n")
+      cat("\n Equalize pHit and RT = ", equalizeRTandPhit, "\n\n")
     sink(NULL)
   }
 

@@ -20,12 +20,22 @@
 #' @param dataPhitCol A string that identifies the name of the column in data that contains the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pHit"
 #' @param dataCorrectCol A string that identifies the name of the column in data that identifies whether the trials were correct (TRUE) or incorrect (FALSE). The default is "correct"
 #' @param loopsPerRWstep A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
-#' @return (1-r_square) for the fit of the model to the RT and pHit (proportion crossed each boundary) data.  This is the value that will be miniized by the optimazation program.
+#' @param minimizeStat A string that specifies which statistic to minimize when optimizing the model fit.  The options are: "BIC" , "AIC" , or "R_Square". Default is "R_Square".
+#' @param pars.n The number of free parameters. When NULL, the program will attempt to calculate the number of free parameters from the input. Default = NULL.
+#' @param equalizeRTandPhit A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the influence of the pHit and RT is equalized in the minimization statistic. If it is set to FALSE, then the the minimazation statistic is calculated as usual. DEFAULT = FALSE.
+#''
+#' @return The minimization statistic for the fit of the model to the RT and pHit (proportion crossed each boundary) data.  This is the value that will be miniized by the optimization program.
 #' @keywords RRW random walk assess fit
 #' @export
 #' @examples assessRRWfit (data, b=14, s=0.1, loopsPerRWstep = 400)
 
-assessRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 200) {
+assessRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 200, minimizeStat = 'R_Square', pars.n = NULL, equalizeRTandPhit = FALSE) {
+
+  #make sure minimizeStat is valid
+  minimizeOpts <- c("BIC", "AIC", "R_Square")
+  if(!(minimizeStat %in% minimizeOpts) ) {
+    stop (paste("you set minimizeStat to:", minimizeStat, ", but it must be one of the following:", minimizeOpts, sep=" "))
+  }
 
   #make sure that the input parameters from the grid search are valid
   validParams <- validateParameters(data=data, b=b, s=s, nSD=nSD, db=db, da=da, vc=vc, bCols=bCols, sCols=sCols, nSDCols=nSDCols, dbCols=dbCols, daCols=daCols, vcCols=vcCols, dataOverlapCol=dataOverlapCol)
@@ -45,22 +55,23 @@ assessRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL
 
     df.fitted <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, bCols = bCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, loops = loopsPerRWstep)
 
-    #get the  minimization variable (1-r2) for the pHit
-    pCor.rss <- min.r2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
+    #get potential minimization variable (1-r2)
+    out.rss <- getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], equalizeRTandPhit = equalizeRTandPhit)
 
-    #try to regress Q50 on rt.  If it works, get (1-r.squared). Otherwise set (1-r.squared) to 1.
-    Q50.rss <- min.r2(df.fitted$rtFit,df.fitted[[dataRtCol]])
-
-    #combine minimization variable (1-r2) for pHit and RT
-    out.rss <- (Q50.rss + pCor.rss)/2
+    #get potential minimization variable BIC
+    if(is.null(pars.n)) {
+      pars.n = 1 + length(b) + ifelse(length(s)==1 & s[1]==0, 0, length(s)) + ifelse(length(nSD)==1 & nSD[1]==0, 0, length(nSD)) + ifelse(length(db)[1]==1 & db==0, 0, length(db)) + ifelse(length(da)[1]==1 & da==0.2, 0, length(da)) + ifelse(length(vc)==1 & vc[1]==0, 0, length(vc))
+    }
+    out.BIC <- getICRRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
+    out.AIC <- getICRRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
 
   } else {
-
-    #if the parameters are not valid, then assign the minimization variable (1-r2) = 9
-    out.rss <- 9
-
+    #if the parameters are not valid, then assign the minimization variable Infinite value (Inf)
+    out.rss <- Inf
+    out.BIC <- Inf
+    out.AIC <- Inf
   }
 
-  #output the minimization variable (1-r2)
-  return(out.rss)
+  #output the minimization variable
+  switch(minimizeStat, BIC = return(out.BIC), AIC = return(out.AIC), R_Square = return(out.rss))
 }

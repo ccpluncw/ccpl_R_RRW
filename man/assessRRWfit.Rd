@@ -8,7 +8,9 @@ assessRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
   bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL,
   daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap",
   RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit",
-  dataCorrectCol = "correct", loopsPerRWstep = 200)
+  dataCorrectCol = "correct", loopsPerRWstep = 200,
+  minimizeStat = "R_Square", pars.n = NULL,
+  equalizeRTandPhit = FALSE)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
@@ -48,9 +50,16 @@ assessRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
 \item{dataCorrectCol}{A string that identifies the name of the column in data that identifies whether the trials were correct (TRUE) or incorrect (FALSE). The default is "correct"}
 
 \item{loopsPerRWstep}{A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.}
+
+\item{minimizeStat}{A string that specifies which statistic to minimize when optimizing the model fit.  The options are: "BIC" , "AIC" , or "R_Square". Default is "R_Square".}
+
+\item{pars.n}{The number of free parameters. When NULL, the program will attempt to calculate the number of free parameters from the input. Default = NULL.}
+
+\item{equalizeRTandPhit}{A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the influence of the pHit and RT is equalized in the minimization statistic. If it is set to FALSE, then the the minimazation statistic is calculated as usual. DEFAULT = FALSE.
+'}
 }
 \value{
-(1-r_square) for the fit of the model to the RT and pHit (proportion crossed each boundary) data.  This is the value that will be miniized by the optimazation program.
+The minimization statistic for the fit of the model to the RT and pHit (proportion crossed each boundary) data.  This is the value that will be miniized by the optimization program.
 }
 \description{
 Function that fits the RRW and returns (1-r2), where r2 is the fit of the RRW simulation to the empirical RT and error data

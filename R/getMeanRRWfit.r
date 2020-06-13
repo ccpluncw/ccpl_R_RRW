@@ -23,12 +23,14 @@
 #' @param numSimsToAverage A number specifying how many times the simulation should be run. When it is run multiple times, the function will calculate the average simulated RT and pHit for each row, and the average and sd r2 and BIC for the set of runs. Default is 10.
 #' @param sinkFilename A string that identifies the name of file (.txt) in which the fit statistics will be saved. The default is NULL, whereby the fit statistics will not be saved.
 #' @param pars.n A number specifying the number of free parameters in the model.  Use this when you are fixing the values of some parameters, but those fixed values are not the default values of the parameters.  Otherwise, the number of free parameters will be automatically caluculated. Default is NULL (automatically calculate).
+#' @param equalizeRTandPhit A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the influence of the pHit and RT is equalized in the minimization statistic. If it is set to FALSE, then the the minimazation statistic is calculated as usual. DEFAULT = FALSE.
+#''
 #' @return A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
 #' @keywords RRW random walk plot output fit
 #' @export
 #' @examples getRRWfit (data, b=14, s=0.1, loopsPerRWstep = 2000, sinkFilename = "outStats.txt")
 
-getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, numSimsToAverage = 10, sinkFilename = NULL, pars.n = NULL) {
+getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, numSimsToAverage = 10, sinkFilename = NULL, pars.n = NULL, equalizeRTandPhit = FALSE) {
 
   #the RW columns are defined by the program. The column used to compare with the data RT is a choice of the user.
   RWkeepColumns <- c("overlap", RwSamplesCol, "pCross", "correct")
@@ -45,8 +47,12 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
   }
 
   df.fitted <- NULL
+  pCor.rss <- NULL
+  Q50.rss <- NULL
+  ave.rss <- NULL
   out.rss <- NULL
   out.BIC <- NULL
+  out.AIC <- NULL
   simPhitCols <- NULL
   simSMPSCols <- NULL
   simRTCols <- NULL
@@ -56,19 +62,18 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
 
     df.tmp <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, bCols = bCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, loops = loopsPerRWstep)
 
-    Q50.lm <- lm(df.tmp[[dataRtCol]]~df.tmp[[RwSamplesCol]])
+    #get (1-r2) for the pHit and RT.
+     pCor.rss[i] <- getMinR2(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol], na.rm = T)
+     Q50.rss[i] <- getMinR2(df.tmp$rtFit,df.tmp[[dataRtCol]], na.rm = T)
+    # #combine (1-r2) for pHit and RT
+    ave.rss[i] <- (Q50.rss[i] + pCor.rss[i])/2
 
-    #caluculate (1-r2)
-    pCor.rss <- min.r2(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol])
-    Q50.rss <- min.r2(df.tmp$rtFit,df.tmp[[dataRtCol]])
-    #add average r2 to the array of average r2s
-    out.rss[i] <- (Q50.rss + pCor.rss)/2
+    out.rss[i] <- getMinR2RRW(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol], df.tmp$rtFit,df.tmp[[dataRtCol]], equalizeRTandPhit = equalizeRTandPhit)
 
     #calculate BIC
-    pCor.BIC <- chutils::ch.BIC(df.tmp[df.tmp$correct == TRUE, dataPhitCol], df.tmp[df.tmp$correct == TRUE, "pCross"], pars.n, standardize = TRUE)
-    Q50.BIC <- chutils::ch.BIC(df.tmp[[dataRtCol]], df.tmp$rtFit, pars.n, standardize = TRUE)
-    #add average BIC to the array of average BICs
-    out.BIC[i] <- (Q50.BIC + pCor.BIC)/2
+    out.BIC[i] <- getICRRW(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol], df.tmp$rtFit,df.tmp[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
+    out.AIC[i] <- getICRRW(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol], df.tmp$rtFit,df.tmp[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
+
 
     #rename the predicted columns to include the run number at the end
     simPhitCols <- c(simPhitCols, paste("pCross",i,sep=""))
@@ -97,28 +102,38 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
   Q50.lm <- lm(df.fitted[[dataRtCol]]~df.fitted[[RwSamplesCol]])
   df.fitted$rtFit = df.fitted[[RwSamplesCol]]*coef(Q50.lm)[2]+coef(Q50.lm)[1]
 
-  #caluculate (1-r2) on the average of fits
-  pCor.rss <- min.r2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
-  Q50.rss <- min.r2(df.fitted$rtFit,df.fitted[[dataRtCol]])
-  #add average r2 to the array of average r2s
-  out.rss.final <- (Q50.rss + pCor.rss)/2
+  #caluculate (1-r2) on the average of fits the pHit and RT.
+   pCor.rss.final <- getMinR2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], na.rm=T)
+   Q50.rss.final <- getMinR2(df.fitted$rtFit,df.fitted[[dataRtCol]], na.rm=T)
+  # #combine (1-r2) for pHit and RT
+  ave.rss.final <- (Q50.rss.final + pCor.rss.final)/2
+
+  out.rss.final <- getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], equalizeRTandPhit = equalizeRTandPhit)
 
   #calculate BIC on the average of fits
-  pCor.BIC <- chutils::ch.BIC(df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted[df.fitted$correct == TRUE, "pCross"], pars.n, standardize = TRUE)
-  Q50.BIC <- chutils::ch.BIC(df.fitted[[dataRtCol]], df.fitted$rtFit, pars.n, standardize = TRUE)
-  #add average BIC to the array of average BICs
-  out.BIC.final <- (Q50.BIC + pCor.BIC)/2
+  out.BIC.final <- getICRRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
+  out.AIC.final <- getICRRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], df.fitted$rtFit,df.fitted[[dataRtCol]], pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
 
   #get mean and sd of fit stats of the individual runs
+  m.Q50.rss <- mean(Q50.rss)
+  sd.Q50.rss <- sd(Q50.rss)
+  m.pCor.rss <- mean(pCor.rss)
+  sd.pCor.rss <- sd(pCor.rss)
+  m.ave.rss <- mean(ave.rss)
+  sd.ave.rss <- sd(ave.rss)
   m.out.rss <- mean(out.rss)
   sd.out.rss <- sd(out.rss)
   m.out.BIC <- mean(out.BIC)
   sd.out.BIC <- sd(out.BIC)
+  m.out.AIC <- mean(out.AIC)
+  sd.out.AIC <- sd(out.AIC)
 
   if (!is.null(sinkFilename)) {
     sink(sinkFilename)
-      cat("\n\n Number of Simulations Run = ", numSimsToAverage, "\n\n")
-      cat("\n\n RTb = ", coef(Q50.lm)[2], "\n\n")
+      cat("\n\n ******** Simulation Epoch Transformation ******** \n\n")
+      cat(" RTb = ", coef(Q50.lm)[2], "\n\n")
+
+      cat("\n\n ******** Parameter Values ******** \n\n")
       cat(" RTi (Ter) = ", coef(Q50.lm)[1], "\n\n")
 
       if(!is.null(bCols)) cat(" Boundary Effect Codes = ", bCols, "\n")
@@ -139,15 +154,30 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
       if(!is.null(vcCols)) cat(" ValueChange Effect Codes = ", vcCols, "\n")
       cat(" ValueChange = ", vc, "\n\n")
 
-      cat("\n\n Average R Square = ", m.out.rss, "\n")
-      cat(" SD R Square = ", sd.out.rss, "\n")
-      cat(" Final R Square = ", out.rss.final, "\n\n")
+      cat("\n\n ******** pHit and RT R Square ******** \n\n")
+      cat(" Number of Simulations Run with the parameter values = ", numSimsToAverage, "\n")
+      cat("\n mean p(hit) R Square = ", 1 - m.pCor.rss, "\n")
+      cat(" sd p(hit) R Square = ", sd.pCor.rss, "\n")
+      cat(" Final p(hit) R Square = ", 1 - pCor.rss.final, "\n")
+      cat("\n mean RT R Square = ", 1 - m.Q50.rss, "\n")
+      cat(" sd RT R Square = ", sd.Q50.rss, "\n")
+      cat(" Final RT R Square = ", 1 - Q50.rss.final, "\n")
+      cat("\n mean Average R Square = ", 1 - m.ave.rss, "\n")
+      cat(" sd AverageR Square = ", sd.ave.rss, "\n")
+      cat(" Final Average R Square = ", 1 - ave.rss.final, "\n")
 
-      cat("\n\n WARNING: BIC does not weight p(Hit) and RT fits equally because the residules are inherently different sizes.  So BIC is a sub-optimal measure of model fit.\n")
-      cat("\n N Parameters = ", pars.n, "\n")
-      cat(" Average BIC = ", m.out.BIC, "\n")
+      cat("\n\n ******** Model Fit Statistics ******** \n\n")
+      cat(" N Parameters = ", pars.n, "\n")
+      cat("\n Average Overall R Square = ", 1-m.out.rss, "\n")
+      cat(" SD Overall R Square = ", sd.out.rss, "\n")
+      cat(" Final Overall R Square = ", 1 - out.rss.final, "\n")
+      cat("\n Average BIC = ", m.out.BIC, "\n")
       cat(" SD BIC = ", sd.out.BIC, "\n")
-      cat(" Final BIC = ", out.BIC.final, "\n\n")
+      cat(" Final BIC = ", out.BIC.final, "\n")
+      cat("\n Average AIC = ", m.out.AIC, "\n")
+      cat(" SD AIC = ", sd.out.AIC, "\n")
+      cat(" Final AIC = ", out.AIC.final, "\n")
+      cat("\n Equalize pHit and RT = ", equalizeRTandPhit, "\n\n")
     sink(NULL)
   }
 

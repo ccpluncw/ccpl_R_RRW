@@ -9,7 +9,7 @@ getRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
   daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap",
   RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit",
   dataCorrectCol = "correct", loopsPerRWstep = 2000,
-  sinkFilename = NULL, pars.n = NULL)
+  sinkFilename = NULL, pars.n = NULL, equalizeRTandPhit = FALSE)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
@@ -53,6 +53,9 @@ getRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
 \item{sinkFilename}{A string that identifies the name of file (.txt) in which the fit statistics will be saved. The default is NULL, whereby the fit statistics will not be saved.}
 
 \item{pars.n}{The number of free parameters in the model. The default is NULL, whereby the function will calculate the number of free parameters automatically.}
+
+\item{equalizeRTandPhit}{A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the influence of the pHit and RT is equalized in the minimization statistic. If it is set to FALSE, then the the minimazation statistic is calculated as usual. DEFAULT = FALSE.
+'}
 }
 \value{
 A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
