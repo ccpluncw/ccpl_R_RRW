@@ -43,13 +43,13 @@ getICRRW <- function (simPhit, dataPhit, simRT, dataRT, numParameters, equalizeR
       #and, reintroduce the influence of n by multiplying the equalized rss by the total n.
     rss.equal <- mean( c(pHit.ave.rss, rt.ave.rss), na.rm = T ) * total.n
 
-    out.IC.final <- chutils::ch.ICfromRSS(rss = rss.equal, n = total.n, numParameters, ICtype = ICtype)
+    out.IC.final <- chutils::ch.ICfromRSS(rss = rss.equal, n = total.n, numParameters = numParameters, ICtype = ICtype)
 
   } else {
     sim <- c(scale(simPhit), scale(simRT))
     dat <- c(scale(dataPhit), scale(dataRT))
 
-    out.IC.final <- chutils::ch.IC(dat, sim, numParameters, standardize = FALSE, ICtype = ICtype)
+    out.IC.final <- chutils::ch.IC(dat, sim, numParameters = numParameters, standardize = FALSE, ICtype = ICtype)
   }
 
   return(out.IC.final)

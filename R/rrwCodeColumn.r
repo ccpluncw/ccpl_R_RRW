@@ -19,13 +19,19 @@ rrwCodeColumn <- function(data,rrwModelList) {
     stop("last df.code entry must be 'default' with a value")
   }
 
-  #code the first condition, make all the rest equal to the default
-  data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[1,1]))), rrwModelList$df.code[1,2], rrwModelList$df.code[numConds,2]))
-  #now, change each other condition from the default to the appropriate code (one at a time)
-  for(i in 2:(numConds -1)) {
-    data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[i,1]))), rrwModelList$df.code[i,2], data[[rrwModelList$columnName]]))
-  }
+  #if there is only one condition (i.e., default)
+  if(numConds == 1) {
+    #code the column as a constant equal to the default
+    data[[rrwModelList$columnName]] <- rrwModelList$df.code[numConds,2]
+  } else {
 
+    #code the first condition, make all the rest equal to the default
+    data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[1,1]))), rrwModelList$df.code[1,2], rrwModelList$df.code[numConds,2]))
+    #now, change each other condition from the default to the appropriate code (one at a time)
+    for(i in 2:(numConds -1)) {
+      data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[i,1]))), rrwModelList$df.code[i,2], data[[rrwModelList$columnName]]))
+    }
+  }
   #return the coded data with the added column
   return(data)
 }

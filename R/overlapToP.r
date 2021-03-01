@@ -8,14 +8,23 @@
 #' @examples overlapToP (0.5)
 
 overlapToP <- function (overlap) {
+
+  #here, as overlap moves greater than 1, that means that D2 starts to become the greater distribution.
+  #p gives you the probability of choosing D1.  This vacillates between 0-1 as the overlap changes.
+
+  #first get the modulo of overlap by 4 (this only has an influence if overlap is greater than 4! it should be between 0 and 1)
+  ovMod4 <- overlap %% 4
+  #then correct the overlap to vacillate properly beween 1 and 0. Again, this only has an influence if overlap is greater than abs(2).
+  overlap <- ifelse(ovMod4 > 2, abs(4 - ovMod4), ovMod4)
+
   p <- (-0.5*(overlap - 1)) + 0.5
 
-  if(p > 1) {
-    p <- 1
-  }
-  if(p < 0) {
-    p <- 0
-  }
+  # if(p > 1) {
+  #   p <- 1
+  # }
+  # if(p < 0) {
+  #   p <- 0
+  # }
 
   return(p)
 }
