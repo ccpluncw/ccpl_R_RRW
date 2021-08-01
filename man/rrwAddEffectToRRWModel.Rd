@@ -4,9 +4,15 @@
 \alias{rrwAddEffectToRRWModel}
 \title{This  function is used to create or modify an rrwModelList}
 \usage{
-rrwAddEffectToRRWModel(rrwModelList = NULL, parameter = NULL,
-  columnName = NULL, ParameterName = NULL, parameterBounds = c(0, 0,
-  0.001), df.code = NULL, GroupByVariables = NULL)
+rrwAddEffectToRRWModel(
+  rrwModelList = NULL,
+  parameter = NULL,
+  columnName = NULL,
+  ParameterName = NULL,
+  parameterBounds = c(0, 0, 0.001),
+  df.code = NULL,
+  GroupByVariables = NULL
+)
 }
 \arguments{
 \item{rrwModelList}{A list that specifies the rrw model.  If you are building a new list, then this should be NULL. If you are adding a new effect to an old list, then this should be the rrwModelList that you are adding an effect to. DEFAULT = NULL}

@@ -4,8 +4,10 @@
 \alias{rrwAddParameterEffectListToRRWModel}
 \title{This  function is used to create or modify an rrwModelList}
 \usage{
-rrwAddParameterEffectListToRRWModel(rrwModelList = NULL,
-  parameterEffectList = NULL)
+rrwAddParameterEffectListToRRWModel(
+  rrwModelList = NULL,
+  parameterEffectList = NULL
+)
 }
 \arguments{
 \item{rrwModelList}{A list that specifies the rrw model.  If you are building a new list, then this should be NULL. If you are adding a new effect to an old list, then this should be the rrwModelList that you are adding an effect to. DEFAULT = NULL}

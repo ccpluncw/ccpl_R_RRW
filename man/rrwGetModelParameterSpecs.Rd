@@ -4,10 +4,12 @@
 \alias{rrwGetModelParameterSpecs}
 \title{This function extracts the parameter bounds, parameter column names, and number of free parameters from the rrwModelList.}
 \usage{
-rrwGetModelParameterSpecs(rrwModelList)
+rrwGetModelParameterSpecs(rrwModelList, startPars.n = 1)
 }
 \arguments{
-\item{rrwModelList}{A list that specifies the rrw model.  Build the rrwModelList useing rrwAddEffectToRRWModel
+\item{rrwModelList}{A list that specifies the rrw model.  Build the rrwModelList useing rrwAddEffectToRRWModel}
+
+\item{startPars.n}{An integer that specifies the number of free parameters that are not specified in the modelList. This will be added to the total number of free parameters in the modelList.  DEFAULT = 1 (#Start at 1 because of Ter)
 '}
 }
 \value{

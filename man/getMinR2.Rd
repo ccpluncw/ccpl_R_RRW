@@ -4,14 +4,14 @@
 \alias{getMinR2}
 \title{Function that calculates (1 - r-square)}
 \usage{
-getMinR2(predY, y, na.rm = T)
+getMinR2(predY, y, standardize = FALSE)
 }
 \arguments{
 \item{predY}{a vector of numbers that is the fitted data generated from a model.}
 
 \item{y}{a vector of numbers that were fitted by a model to produce predY.}
 
-\item{na.rm}{a boolean that specifies whether to remove NAs. DEFAULT = T.}
+\item{standardize}{A boolean that specifies whether to standardize the scores before calculating the BIC. Standardization is useful if you want to combine different DVs into a single BIC (e.g., RT and accuracy). DEFAULT = FALSE.}
 }
 \value{
 (1-r2) this is used as the value to be minimized by an optimization program

@@ -4,8 +4,22 @@
 \alias{validateParameters}
 \title{This function validates the parameters for RRW.}
 \usage{
-validateParameters(data, b, s, nSD, db, da, vc, bCols, sCols, nSDCols,
-  dbCols, daCols, vcCols, dataOverlapCol)
+validateParameters(
+  data,
+  b,
+  s,
+  nSD,
+  db,
+  da,
+  vc,
+  bCols,
+  sCols,
+  nSDCols,
+  dbCols,
+  daCols,
+  vcCols,
+  dataOverlapCol
+)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}

@@ -2,15 +2,19 @@
 #'
 #' Function that extracts the parameter bounds, parameter column names, and number of free parameters from the rrwModelList.
 #' @param rrwModelList A list that specifies the rrw model.  Build the rrwModelList useing rrwAddEffectToRRWModel
+#' @param startPars.n An integer that specifies the number of free parameters that are not specified in the modelList. This will be added to the total number of free parameters in the modelList.  DEFAULT = 1 (#Start at 1 because of Ter)
 #''
 #' @return a list containing the parameter column names (pCols), the number of free parameters (pars.n), and the parameter upperBound, lowerBound, and interval (pU, pL, pI)
 #' @keywords rrw RRW parameter specs extract
 #' @export
 #' @examples rrwGetModelParameterSpecs (modelList)
 
-rrwGetModelParameterSpecs <- function (rrwModelList) {
+rrwGetModelParameterSpecs <- function (rrwModelList, startPars.n = 1) {
   #Specify all the possible parameters
-  parameters <- c("s", "b", "db", "da", "nSD", "vc")
+  #parameters <- c("s", "b", "db", "da", "nSD", "vc")
+
+  #Get the parameters from the modelList
+  parameters <- names(rrwModelList)
 
   #Initiate all the lists that will be output
   pU <- list()

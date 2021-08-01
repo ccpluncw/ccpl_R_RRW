@@ -4,14 +4,29 @@
 \alias{rrwRunSmartGridSearch}
 \title{This function takes the raw data and the rrwModelList as input, collapses the data, codes the columns, gets the parameter information, runs the smartGridSearch, and outputs the smartGridSearch results.}
 \usage{
-rrwRunSmartGridSearch(data, rrwModelList, minN = 20,
-  dataOverlapCol = "overlapRound", RwSamplesCol = "Q50",
-  dataRtCol = "rt", correctCol = "correct", correctVals = c(TRUE,
-  FALSE), loopsPerRWstep = 200, minimizeStat = "BIC",
-  equalizeRTandPhit = FALSE, pars.n = NULL, numLoops = 200,
-  numIntervals = 25, optParamListN = 10, optBoundLoops = 10,
-  multicore = FALSE, multicorePackages = NULL, fileTag = NULL,
-  numSimsToAverage = 10, ...)
+rrwRunSmartGridSearch(
+  data,
+  rrwModelList,
+  minN = 20,
+  dataOverlapCol = "overlapRound",
+  RwSamplesCol = "Q50",
+  dataRtCol = "rt",
+  correctCol = "correct",
+  correctVals = c(TRUE, FALSE),
+  loopsPerRWstep = 200,
+  minimizeStat = "BIC",
+  equalizeRTandPhit = FALSE,
+  pars.n = NULL,
+  numLoops = 200,
+  numIntervals = 25,
+  optParamListN = 10,
+  optBoundLoops = 10,
+  multicore = FALSE,
+  multicorePackages = NULL,
+  fileTag = NULL,
+  numSimsToAverage = 10,
+  ...
+)
 }
 \arguments{
 \item{data}{This is a dataframe containing the raw trial-by-trial data that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}

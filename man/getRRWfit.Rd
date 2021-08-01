@@ -4,12 +4,30 @@
 \alias{getRRWfit}
 \title{This function generates an RRW simulation, fits it to empirical data, and and outputs the fit.}
 \usage{
-getRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
-  bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL,
-  daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap",
-  RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit",
-  dataCorrectCol = "correct", loopsPerRWstep = 2000,
-  sinkFilename = NULL, pars.n = NULL, equalizeRTandPhit = FALSE)
+getRRWfit(
+  data,
+  b,
+  s = 0,
+  nSD = 0,
+  db = 0,
+  da = 0.2,
+  vc = 0,
+  bCols = NULL,
+  sCols = NULL,
+  nSDCols = NULL,
+  dbCols = NULL,
+  daCols = NULL,
+  vcCols = NULL,
+  dataOverlapCol = "overlap",
+  RwSamplesCol = "Q50",
+  dataRtCol = "rt",
+  dataPhitCol = "pHit",
+  dataCorrectCol = "correct",
+  loopsPerRWstep = 2000,
+  sinkFilename = NULL,
+  pars.n = NULL,
+  equalizeRTandPhit = FALSE
+)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}

@@ -19,12 +19,5 @@ overlapToP <- function (overlap) {
 
   p <- (-0.5*(overlap - 1)) + 0.5
 
-  # if(p > 1) {
-  #   p <- 1
-  # }
-  # if(p < 0) {
-  #   p <- 0
-  # }
-
   return(p)
 }

@@ -47,10 +47,10 @@ getRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, s
 
   #caluculate (1-r2)
   #get the  minimization variable (1-r2) for the pHit
-  pCor.rss <- getMinR2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], na.rm=T)
+  pCor.rss <- getMinR2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
 
   #and RT.
-  Q50.rss <- getMinR2(df.fitted$rtFit,df.fitted[[dataRtCol]], na.rm=T)
+  Q50.rss <- getMinR2(df.fitted$rtFit,df.fitted[[dataRtCol]])
 
   #combine (1-r2) for pHit and RT
   ave.rss <- (Q50.rss + pCor.rss)/2

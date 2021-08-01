@@ -4,8 +4,16 @@
 \alias{pCrossBoundaryDist}
 \title{This function simulates the RRW for a single set of parameters across a single overlap.}
 \usage{
-pCrossBoundaryDist(overlap, boundary, stepSize = 1, startValue = 0,
-  noiseSD = 0, decayAsymptote = 0.2, decayBeta = 0, loops = 200)
+pCrossBoundaryDist(
+  overlap,
+  boundary,
+  stepSize = 1,
+  startValue = 0,
+  noiseSD = 0,
+  decayAsymptote = 0.2,
+  decayBeta = 0,
+  loops = 200
+)
 }
 \arguments{
 \item{overlap}{A number between 0-1 representing a single distributional overlap.}

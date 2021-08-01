@@ -1,39 +1,182 @@
 library(chutils)
 ch.updateRpackage (packageName = "chMorals")
+source("chyTest1.r")
+regFits$RTdat
+regFits$pHVOdat
+unloadNamespace("chMorals")
 ch.updateRpackage (packageName = "chMorals")
-ch.updateRpackage (packageName = "RRW")
-ch.updateRpackage (packageName = "RRW")
-inputDataFile <- "Apr_19_2020_16-03_deathMethod_overallChoice FitResults.txt"
-df.fitted <-read.table(inputDataFile, header=T, sep="\t")
-head(df.fitted)
-inputDataFile <- "Apr_19_2020_16-03_deathMethod_overallChoice Fitted.txt"
-df.fitted <-read.table(inputDataFile, header=T, sep="\t")
-head(df.fitted)
-getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = FALSE)
+regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)
+regFits$pHVOdat
+regFits$RTdat
+regFits$pHVOdat
+regFits$pHVOFit
+fitted(regFits$pHVOFit)
+predict(regFits$pHVOFit)
+unloadNamespace("chMorals")
+ch.updateRpackage (packageName = "chMorals")
+regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)
+predict(regFits$RTfit)
+data <- df.out4 #
+RTCol <- "keybRT"
+overlapRoundCol = "overlapRound"; correctCol = "correct"; correctVals = c(1,0);  minNperOverlap = params$minOverlapN
+data$correct01 <- ifelse (data[[correctCol]]==correctVals[1], 1, 0)#
+#
+		df.tmp.pHVO <- as.data.frame(data %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(pHit = mean(correct01, na.rm=T), n =sum(!is.na(correct01)) ) )#
+#
+		df.tmp.pHVO <- df.tmp.pHVO[df.tmp.pHVO$n > minNperOverlap,]#
+#
+		df.tmp.RT.correct <- as.data.frame(data[data$correct01 == 1, ] %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(aveRT = mean(eval(parse(text = RTCol)), na.rm=T), medianRT = median(eval(parse(text = RTCol)), na.rm=T), n =sum(!is.na(correct01)) ) )#
+#
+		df.tmp.RT.correct <- df.tmp.RT.correct[df.tmp.RT.correct$n > minNperOverlap,]#
+#
+		pHVOFit <- chutils::ch.pHVOfit(df.tmp.pHVO[[overlapRoundCol]], df.tmp.pHVO$pHit)
+library(dplyr)
+data$correct01 <- ifelse (data[[correctCol]]==correctVals[1], 1, 0)#
+#
+		df.tmp.pHVO <- as.data.frame(data %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(pHit = mean(correct01, na.rm=T), n =sum(!is.na(correct01)) ) )#
+#
+		df.tmp.pHVO <- df.tmp.pHVO[df.tmp.pHVO$n > minNperOverlap,]#
+#
+		df.tmp.RT.correct <- as.data.frame(data[data$correct01 == 1, ] %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(aveRT = mean(eval(parse(text = RTCol)), na.rm=T), medianRT = median(eval(parse(text = RTCol)), na.rm=T), n =sum(!is.na(correct01)) ) )#
+#
+		df.tmp.RT.correct <- df.tmp.RT.correct[df.tmp.RT.correct$n > minNperOverlap,]#
+#
+		pHVOFit <- chutils::ch.pHVOfit(df.tmp.pHVO[[overlapRoundCol]], df.tmp.pHVO$pHit)
+df.tmp.pHVO$fit <- predict(pHVOFit)
+df.tmp.pHVO$fit <- fitted(pHVOFit)
+df.tmp.pHVO$fit
+pHVOFit
+df.tmp.pHVO$fit <- fitted(pHVOFit[["nlsObject"]])
+df.tmp.pHVO
+unloadNamespace("chMorals")
+ch.updateRpackage (packageName = "chMorals")
+regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)
+regFits$pHVOdat
+regFits$pHVOdat$fit
+regFits$pHVOdat[["fit"]]
+regFits$pHVOdat["fit"]
+regFits$RTdat
+unloadNamespace("chMorals")
+ch.updateRpackage (packageName = "chMorals")
+regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)#
+#
+  out.rss <- getMinR2RRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE)#
+  out.BIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "BIC")#
+  out.AIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "AIC")
+library(RRW)
+out.rss <- getMinR2RRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE)#
+  out.BIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "BIC")#
+  out.AIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "AIC")
+regFits$pHVOdat["fit"]
+regFits$pHVOdat["pHVO"]
+regFits$RTdat["fit"]
+regFits$RTdat["aveRT"]
+out.rss <- getMinR2RRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE)
+pars.n <- 2#
+  out.BIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], pars.n, equalizeRTandPhit = TRUE, ICtype = "BIC")#
+  out.AIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], pars.n, equalizeRTandPhit = TRUE, ICtype = "AIC")
+out.BIC
+out.rss <- getMinR2RRW(as.numeric(regFits$pHVOdat["fit"]), as.numeric(regFits$pHVOdat["pHVO"]), as.numeric(regFits$RTdat["fit"]),as.numeric(regFits$RTdat["aveRT"]), equalizeRTandPhit = TRUE)
+out.rss <- getMinR2RRW(unlist(regFits$pHVOdat["fit"]), unlist(regFits$pHVOdat["pHVO"]), unlist(regFits$RTdat["fit"]), unlist(regFits$RTdat["aveRT"]), equalizeRTandPhit = TRUE)
+out.rss
+regFits$pHVOdat["fit"]
+as.vector(regFits$pHVOdat["fit"])
+unlist(regFits$pHVOdat["fit"])
+out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat["fit"]), as.vector(regFits$pHVOdat["pHVO"]), as.vector(regFits$RTdat["fit"]), as.vector(regFits$RTdat["aveRT"]), equalizeRTandPhit = TRUE)
+regFits$pHVOdat$fit
+regFits$pHVOdat$fit[1]
+regFits$pHVOdat$fit[]
+regFits$pHVOdat$fit[,1]
+as.vector(regFits$pHVOdat$fit)
+out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit), as.vector(regFits$RTdat$aveRT), equalizeRTandPhit = TRUE)
+out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit), as.vector(regFits$RTdat$aveRT), equalizeRTandPhit = TRUE)#
+  pars.n <- 2#
+  out.BIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "BIC")#
+  out.AIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "AIC")
+out.rss
+out.BIC
+names(regFits)
+regFits$RTfit
+regFits$RTfit$rsquare
+summary(regFits$RTfit)
+regFits$pHVOR2
+regFits$pHVOdat
+with(regFits$pHVOdat, plot(pHVO~overlapRound))
+with(regFits$pHVOdat, points(fit~overlapRound, pch=16))
+df.tmp.pHVO <- as.data.frame(data %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(pHVO = mean(correct01, na.rm=T), n =sum(!is.na(correct01)) ) )
+df.tmp.pHVO
+nrow(df.out3)
+nrow(df.out4)
+params$lowRTthreshold
+params$highRTthreshold
+params$chanceThreshold
+unloadNamespace("chMorals")
+ch.updateRpackage (packageName = "chMorals")
+source("chyTest1.r")
+regFits$pHVOdat
+regFits
+with(regFits$pHVOdat, plot(pHVO~overlapRound))
+df.over
+head(df.out3)
+with(regFits$pHVOdat, plot(rt~overlapRound))
+with(regFits$rtdat, plot(aveRT~overlapRound))
+regFits$rtdat
+regFits$RTdat
+with(regFits$RTdat, plot(aveRT~overlapRound))
+with(regFits$RTdat, plot(pHVO~overlapRound))
+with(regFits$pHVOdat, plot(pHVO~overlapRound))
+with(regFits$pHVOdat, plot(pHVO~overlapRound, ylim=c(0,1)))
+with(regFits$pHVOdat, points(fit~overlapRound, pch=16))
+source("chyTest1.r")
+head(df.out3)
+df.out3 <- ch.mergeChoiceDataWithOverlapsData(df.out2, df.over, "overlap", "direction", "keyDef", respChoiceVal = c("Donate", "Keep"), item1cols = c("Item"), item2cols = c("ref_holder"), overlapItem1cols = c("IA1"), overlapItem2cols = c("IB1"),outfile = "testMerge.txt", roundThreshold = 0.1, roundDirection = ceiling)
+head(df.out3)
+df.over
+with(regFits$pHVOdat, plot(pHVO~overlapRound, ylim=c(0,1)))
+source("chyTest1.r")
+regFits
+nrow(df.out3)
+nrow(df.out4)
+.05* 26259
+.05* 26259 + 197
+24750 + 1509
+with(regFits$pHVOdat, plot(pHVO~overlapRound, ylim=c(0,1)))
+with(regFits$pHVOdat, points(fit~overlapRound, pch=16))
+with(regFits$RTdat, plot(aveRT~overlapRound))
+out.rss
+out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit), as.vector(regFits$RTdat$aveRT), equalizeRTandPhit = TRUE)#
+  pars.n <- 3#
+  out.BIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "BIC")#
+  out.AIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "AIC")
+out.BIC
+summary(regFits$RTfit)
+head(df.out2)
+xx<- unique(df.out2[,c("Item", "ref_holder")])
+xx
+unloadNamespace("chMorals")
+ch.updateRpackage (packageName = "chMorals")
+ch.getPrompts(df.out3, item1cols = c("Item"), item2cols = c("ref_holder"))
+head(df.over)
+?seq
+seq("IA1", "IA3", 1)
+paste("IA"), seq(1,3,1)
+paste("IA", seq(1,3,1))
+paste("IA", seq(1,3,1), sep="")
+xx <- paste("IA", seq(1,3,1), sep="")
+length(xx)
+xx
 unloadNamespace("RRW")
 ch.updateRpackage (packageName = "RRW")
-getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = FALSE)
-getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = T)
-1 -getMinR2RRW(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, "pHit"], df.fitted$rtFit,df.fitted$rt, equalizeRTandPhit = T)
+ch.updateRpackage (packageName = "RRW")
+unloadNamespace("chMorals")
+ch.updateRpackage (packageName = "chMorals")
+r_out <- rrwAssessComparisonDistribitionFit <- function (df.out2, df.valueDat, refDistN = median(valueStats$N), refDistMean = median(valueStats$valueMedian), refDistSD = median(valueStats$valueSD), item1cols = c("Item"), item2cols = c("ref_holder"), respChoiceCol = "keyDef", respChoiceVal = c("Donate", "Keep"), RTCol = resCol, chanceThreshold = params$chanceThreshold, lowRTquantileThreshold = params$lowRTthreshold, highRTquantileThreshold = params$highRTthreshold, minOverlapN = params$minOverlapN, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, overlapNumRuns = 1000, combFun = ch.maxAveComb, probMax = 0.5)
+)))
+wd <- getwd()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")
+use_package("chMorals") # Defaults to imports
+use_package("chValues") # Defaults to imports
 unloadNamespace("RRW")
+unloadNamespace("chMorals")
 ch.updateRpackage (packageName = "RRW")
-ch.updateRpackage (packageName = "RRW")
-log(.03)
-log(.02)
-unloadNamespace("RRW")
-ch.updateRpackage (packageName = "RRW")
-unloadNamespace("RRW")
-ch.updateRpackage (packageName = "RRW")
-ch.updateRpackage (packageName = "RRW")
-unloadNamespace("chutils")
-wd1 <- getwd()#
-library(devtools)#
-library(roxygen2)#
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/chutils")#
-document()#
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages")#
-install("chutils")#
-library("chutils")#
-setwd(wd1)
-unloadNamespace("RRW")
-ch.updateRpackage (packageName = "RRW")
+ch.updateRpackage (packageName = "chMorals")

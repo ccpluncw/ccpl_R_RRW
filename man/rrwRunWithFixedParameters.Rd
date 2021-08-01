@@ -4,12 +4,23 @@
 \alias{rrwRunWithFixedParameters}
 \title{This function runs a set of fixed parameters (specified in a rrwModelList) to generate the fits to the data. It takes the raw data and the rrwModelList as input, collapses the data, codes the columns, gets the parameter information, runs the getMeanRRWfit, and outputs the smartGridSearch results. rrwModelList should only have fixed parameter values (upperBound==lowerBound).}
 \usage{
-rrwRunWithFixedParameters(data, rrwModelList, minN = 20,
-  dataOverlapCol = "overlapRound", RwSamplesCol = "Q50",
-  dataRtCol = "rt", correctCol = "correct", correctVals = c(TRUE,
-  FALSE), loopsPerRWstep = 200, minimizeStat = "R_Square",
-  equalizeRTandPhit = FALSE, pars.n = NULL, fileTag = NULL,
-  numSimsToAverage = 10, ...)
+rrwRunWithFixedParameters(
+  data,
+  rrwModelList,
+  minN = 20,
+  dataOverlapCol = "overlapRound",
+  RwSamplesCol = "Q50",
+  dataRtCol = "rt",
+  correctCol = "correct",
+  correctVals = c(TRUE, FALSE),
+  loopsPerRWstep = 200,
+  minimizeStat = "R_Square",
+  equalizeRTandPhit = FALSE,
+  pars.n = NULL,
+  fileTag = NULL,
+  numSimsToAverage = 10,
+  ...
+)
 }
 \arguments{
 \item{data}{This is a dataframe containing the raw trial-by-trial data that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}

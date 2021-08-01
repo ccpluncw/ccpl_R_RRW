@@ -2,7 +2,7 @@
 #'
 #' Function that plots the rrw data fits from the output of getMeanRRWfit() and the rrwModelList.
 #' @param df.RRWout This is a dataframe containing the output from getMeanRRWfit() or rrwRunWithFixedParameters () or rrwRunSmartGridSearch (). It contains the rrwData and the simulation fits.
-#' @param rrwModelList A list that specifies the rrw model.  Build the rrwModelList useing rrwAddEffectToRRWModel
+#' @param grpCols A vector of strings containing the grouping columns. If NULL this argument will be ignored.  DEFAULT = NULL
 #' @param dataRtCol A string that identifies the name of the column in data that contains the RTs for the specific overlap/correct/condition combination. Default is "rt"
 #' @param dataPhitCol A string that identifies the name of the column in data that contains the proportion of trials that are either correct or incorrect for the specific overlap/correct/condition combination. Default is "pHit"
 #' @param rtFitCol A string that identifies the name of the column in data that contains the RRW fit of the RTs for the specific overlap/correct/condition combination. Default is "rt"
@@ -17,7 +17,7 @@
 #' @export
 #' @examples rrwPlotSGSoutput(df.fitted, "rt", "pHit", "rtFit", "pCross", "correct", "overlap", fileTag = NULL, numSimsToPlot = 40)
 
-rrwPlotSGSoutput <- function (df.RRWout, rrwModelList, dataRtCol = 'rt', dataPhitCol = 'pHit', rtFitCol = 'rtFit', pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap",fileTag = NULL, numSimsToPlot = 10) {
+rrwPlotSGSoutputByGroup <- function (df.RRWout, grpCols = NULL, dataRtCol = 'rt', dataPhitCol = 'pHit', rtFitCol = 'rtFit', pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap",fileTag = NULL, numSimsToPlot = 10) {
 
   #if fileTag does not exist, create one based on the timestamp
   if(is.null(fileTag)) {
@@ -28,21 +28,6 @@ rrwPlotSGSoutput <- function (df.RRWout, rrwModelList, dataRtCol = 'rt', dataPhi
   plotFilename <- paste(fileTag,"FitResults.pdf")
   #get the xy axis bounds
   yMinMixRT <- chutils::ch.getPlotAxisMinMax(df.RRWout[[dataRtCol]])
-
-  #add the grouping columns specified in the rrwModelList
-  grpCols <- NULL
-  #try as a nested list first
-  tryCatch ({
-    grpCols <- unique(as.vector(unlist(lapply(unlist(rrwModelList, recursive=FALSE), `[`, "GroupByVariables"))))
-    }, error = function(e) {}
-  )
-  #if that fails, try as an unnested list
-  if(is.null(grpCols)) {
-    tryCatch ({
-      grpCols <- unique(as.vector(unlist(lapply(rrwModelList, `[`, "GroupByVariables"))))
-      }, error = function(e) {}
-    )
-  }
 
   #create a condition variable that codes all the conditions in a single variable
   #if there are grouping variables
@@ -69,30 +54,30 @@ rrwPlotSGSoutput <- function (df.RRWout, rrwModelList, dataRtCol = 'rt', dataPhi
       tmpConds <- unique(df.RRWout[[i]])
       for(j in tmpConds) {
         #plot with individual simulations
-        plotRRWFit2(df.RRWout[df.RRWout[[i]] == j,], dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("withSims-",i,"-",j, plotFilename, sep=""), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
+        if(numSimsToPlot > 0) {
+          plotRRWFit2(df.RRWout[df.RRWout[[i]] == j,], dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("withSims-",i,"-",j, plotFilename, sep=""), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
+        }
         #plot without individual simulations
         plotRRWFit2(df.RRWout[df.RRWout[[i]] == j,], dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste(i,"-",j, plotFilename, sep=""), yMinMixRT=yMinMixRT, numSimsToPlot=0)
-        # plotMeanRRWFit(df.RRWout[df.RRWout[[i]] == j,], dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("withSims-",i,"-",j, plotFilename, sep=""), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
-        # plotRRWFit(df.RRWout[df.RRWout[[i]] == j,], dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol = "cond", plotFilename = paste(i,"-",j, plotFilename, sep=""), yMinMixRT=yMinMixRT)
       }
     }
   }
 
   #for the condition variable, plot the data with all the simulations and without all the simulations (only the mean simulation).
   if ("cond" %in% colnames(df.RRWout)) {
-    #plot with individual simulations
-    plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol = "cond", plotFilename = paste("withSim-cond", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
+    if(numSimsToPlot > 0) {
+      #plot with individual simulations
+      plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol = "cond", plotFilename = paste("withSim-cond", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
+    }
     #plot without individual simulations
     plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol = "cond", plotFilename = paste("cond", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=0)
-    # plotMeanRRWFit(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol = "cond", plotFilename = paste("withSim-cond", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
-    # plotRRWFit(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol = "cond", plotFilename = paste("cond", plotFilename, sep=""), yMinMixRT=yMinMixRT)
   } else {
-    #plot with individual simulations
-    plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol,  plotFilename = paste("withSim-simple", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
+    if(numSimsToPlot > 0) {
+      #plot with individual simulations
+      plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol,  plotFilename = paste("withSim-simple", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
+    }
     #plot without individual simulations
     plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol,  plotFilename = paste("simple", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=0)
-    # plotMeanRRWFit(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol,  plotFilename = paste("withSim-simple", plotFilename), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot)
-    # plotRRWFit(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, plotFilename = paste("simple", plotFilename, sep=""), yMinMixRT=yMinMixRT)
   }
 
 }

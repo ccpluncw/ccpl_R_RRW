@@ -4,13 +4,30 @@
 \alias{assessRRWfit}
 \title{This function fits the RRW and returns (1-r2).}
 \usage{
-assessRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
-  bCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL,
-  daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap",
-  RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit",
-  dataCorrectCol = "correct", loopsPerRWstep = 200,
-  minimizeStat = "R_Square", pars.n = NULL,
-  equalizeRTandPhit = FALSE)
+assessRRWfit(
+  data,
+  b,
+  s = 0,
+  nSD = 0,
+  db = 0,
+  da = 0.2,
+  vc = 0,
+  bCols = NULL,
+  sCols = NULL,
+  nSDCols = NULL,
+  dbCols = NULL,
+  daCols = NULL,
+  vcCols = NULL,
+  dataOverlapCol = "overlap",
+  RwSamplesCol = "Q50",
+  dataRtCol = "rt",
+  dataPhitCol = "pHit",
+  dataCorrectCol = "correct",
+  loopsPerRWstep = 200,
+  minimizeStat = "BIC",
+  pars.n = NULL,
+  equalizeRTandPhit = FALSE
+)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
@@ -51,7 +68,7 @@ assessRRWfit(data, b, s = 0, nSD = 0, db = 0, da = 0.2, vc = 0,
 
 \item{loopsPerRWstep}{A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.}
 
-\item{minimizeStat}{A string that specifies which statistic to minimize when optimizing the model fit.  The options are: "BIC" , "AIC" , or "R_Square". Default is "R_Square".}
+\item{minimizeStat}{A string that specifies which statistic to minimize when optimizing the model fit.  The options are: "BIC" , "AIC" , or "R_Square". Default is "BIC".}
 
 \item{pars.n}{The number of free parameters. When NULL, the program will attempt to calculate the number of free parameters from the input. Default = NULL.}
 

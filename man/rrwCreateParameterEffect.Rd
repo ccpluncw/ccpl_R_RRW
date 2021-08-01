@@ -4,9 +4,14 @@
 \alias{rrwCreateParameterEffect}
 \title{This  function is used to creates am rrwParemeterEffect for an rrwModelList}
 \usage{
-rrwCreateParameterEffect(parameter = NULL, columnName = NULL,
-  ParameterName = NULL, parameterBounds = c(0, 0, 0.001),
-  df.code = NULL, GroupByVariables = NULL)
+rrwCreateParameterEffect(
+  parameter = NULL,
+  columnName = NULL,
+  ParameterName = NULL,
+  parameterBounds = c(0, 0, 0.001),
+  df.code = NULL,
+  GroupByVariables = NULL
+)
 }
 \arguments{
 \item{parameter}{A string that specifies the parameter that the effect being added will influence.  It can take on one of the following values: "s","b","nSD", "db". "da". "vc" DEFAULT = NULL}

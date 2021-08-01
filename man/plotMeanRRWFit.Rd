@@ -4,10 +4,20 @@
 \alias{plotMeanRRWFit}
 \title{This function plots the fitted RRW simulation as a function of the empirical data.}
 \usage{
-plotMeanRRWFit(data, dataRtCol = "rt", dataPhitCol = "pHit",
-  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct",
-  overlapCol = "overlap", condCol = NULL, numSimsToPlot = 10,
-  plotFilename = NULL, twoPlotsPerPage = TRUE, yMinMixRT = NULL)
+plotMeanRRWFit(
+  data,
+  dataRtCol = "rt",
+  dataPhitCol = "pHit",
+  rtFitCol = "rtFit",
+  pHitFitCol = "pCross",
+  correctCol = "correct",
+  overlapCol = "overlap",
+  condCol = NULL,
+  numSimsToPlot = 10,
+  plotFilename = NULL,
+  twoPlotsPerPage = TRUE,
+  yMinMixRT = NULL
+)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}

@@ -4,8 +4,16 @@
 \alias{RRW}
 \title{This function simulates the RRW to build the response distribution.}
 \usage{
-RRW(overlap, boundary, samples, startValue = 0, noiseSD = 0,
-  decayAsymptote = 0.2, decayBeta = 0, loops = 200)
+RRW(
+  overlap,
+  boundary,
+  samples,
+  startValue = 0,
+  noiseSD = 0,
+  decayAsymptote = 0.2,
+  decayBeta = 0,
+  loops = 200
+)
 }
 \arguments{
 \item{overlap}{A number between 0-1 representing a single distributional overlap.}

@@ -4,13 +4,20 @@
 \alias{getICRRW}
 \title{Function that calculates AIC or BIC for the entire RRW dataset}
 \usage{
-getICRRW(simPhit, dataPhit, simRT, dataRT, numParameters,
-  equalizeRTandPhit = FALSE, ICtype = "BIC")
+getICRRW(
+  simPhit,
+  dataPhit,
+  simRT,
+  dataRT,
+  numParameters,
+  equalizeRTandPhit = FALSE,
+  ICtype = "BIC"
+)
 }
 \arguments{
 \item{simPhit}{a vector of numbers that is the fitted data generated from the model for the probability correct.}
 
-\item{dataPhit}{a vector of numbers that were fitted by a model to produce simPhit.}
+\item{dataPhit}{a vector of numbers that were fitted by a model to produce simRT.}
 
 \item{simRT}{a vector of numbers that is the fitted data generated from the model for the RT.}
 
@@ -20,8 +27,6 @@ getICRRW(simPhit, dataPhit, simRT, dataRT, numParameters,
 
 \item{ICtype}{A string specifying whether to return the AIC or BIC.  Valid inputs are: "AIC" and "BIC".  DEFAULT = "BIC"
 '}
-
-\item{dataPhit}{a vector of numbers that were fitted by a model to produce simRT.}
 }
 \value{
 BIC this is used as the value to be minimized by an optimization program

@@ -63,8 +63,8 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
     df.tmp <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, bCols = bCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, loops = loopsPerRWstep)
 
     #get (1-r2) for the pHit and RT.
-     pCor.rss[i] <- getMinR2(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol], na.rm = T)
-     Q50.rss[i] <- getMinR2(df.tmp$rtFit,df.tmp[[dataRtCol]], na.rm = T)
+     pCor.rss[i] <- getMinR2(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol])
+     Q50.rss[i] <- getMinR2(df.tmp$rtFit,df.tmp[[dataRtCol]])
     # #combine (1-r2) for pHit and RT
     ave.rss[i] <- (Q50.rss[i] + pCor.rss[i])/2
 
@@ -103,8 +103,8 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
   df.fitted$rtFit = df.fitted[[RwSamplesCol]]*coef(Q50.lm)[2]+coef(Q50.lm)[1]
 
   #caluculate (1-r2) on the average of fits the pHit and RT.
-   pCor.rss.final <- getMinR2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol], na.rm=T)
-   Q50.rss.final <- getMinR2(df.fitted$rtFit,df.fitted[[dataRtCol]], na.rm=T)
+   pCor.rss.final <- getMinR2(df.fitted[df.fitted$correct == TRUE, "pCross"], df.fitted[df.fitted$correct == TRUE, dataPhitCol])
+   Q50.rss.final <- getMinR2(df.fitted$rtFit,df.fitted[[dataRtCol]])
   # #combine (1-r2) for pHit and RT
   ave.rss.final <- (Q50.rss.final + pCor.rss.final)/2
 

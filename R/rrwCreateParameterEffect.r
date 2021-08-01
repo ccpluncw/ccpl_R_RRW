@@ -15,7 +15,7 @@
 
 rrwCreateParameterEffect <- function (parameter = NULL, columnName = NULL, ParameterName = NULL, parameterBounds = c(0,0,0.001), df.code = NULL, GroupByVariables = NULL) {
 
-    validParameters <- c("s", "b", "db", "da", "nSD", "vc")
+    validParameters <- c("s", "b", "db", "da", "nSD", "vc", "rdN", "rdMean", "rdSD")
 
     if(!(parameter %in% validParameters)) {
       stop(paste("parameter option must take on one of the following values: ", paste(validParameters, sep="", collapse=" ")))

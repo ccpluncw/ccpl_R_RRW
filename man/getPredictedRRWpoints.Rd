@@ -4,11 +4,28 @@
 \alias{getPredictedRRWpoints}
 \title{This function simulates the RRW for a single set of parameters across all values of overlap.}
 \usage{
-getPredictedRRWpoints(data, RWkeepColumns, mergeByDataColumns,
-  mergeByRWColumns, dataRtCol, RwSamplesCol, dataOverlapCol, b,
-  startValue = 0, noiseSD = 0, decayBeta = 0, decayAsymptote = 0.2,
-  valueChange = 0, bCols = NULL, sCols = NULL, nSDCols = NULL,
-  dbCols = NULL, daCols = NULL, vcCols = NULL, loops = 200)
+getPredictedRRWpoints(
+  data,
+  RWkeepColumns,
+  mergeByDataColumns,
+  mergeByRWColumns,
+  dataRtCol,
+  RwSamplesCol,
+  dataOverlapCol,
+  b,
+  startValue = 0,
+  noiseSD = 0,
+  decayBeta = 0,
+  decayAsymptote = 0.2,
+  valueChange = 0,
+  bCols = NULL,
+  sCols = NULL,
+  nSDCols = NULL,
+  dbCols = NULL,
+  daCols = NULL,
+  vcCols = NULL,
+  loops = 200
+)
 }
 \arguments{
 \item{data}{This is a dataframe that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}

@@ -4,9 +4,18 @@
 \alias{getMomentsOfRRWoverlap}
 \title{This function simulates the RRW for a single set of parameters across all values of overlap.}
 \usage{
-getMomentsOfRRWoverlap(overlapSeq, boundary, correctBoundary = 1,
-  stepSize = 1, startValue = 0, noiseSD = 0, decayAsymptote = 0.2,
-  decayBeta = 0, loops = 200, progress = FALSE)
+getMomentsOfRRWoverlap(
+  overlapSeq,
+  boundary,
+  correctBoundary = 1,
+  stepSize = 1,
+  startValue = 0,
+  noiseSD = 0,
+  decayAsymptote = 0.2,
+  decayBeta = 0,
+  loops = 200,
+  progress = FALSE
+)
 }
 \arguments{
 \item{overlapSeq}{A vector of numbers between 0-1 representing distributional overlaps.}
