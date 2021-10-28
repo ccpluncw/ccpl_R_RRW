@@ -10,7 +10,8 @@ rrwRawDataToRRWFormatData(
   dataRtCol = "rt",
   correctCol = "correct",
   correctVals = c(TRUE, FALSE),
-  dataOverlapCol = "overlapRound"
+  dataOverlapCol = "overlapRound",
+  splitByCorrect = TRUE
 )
 }
 \arguments{
@@ -24,7 +25,9 @@ rrwRawDataToRRWFormatData(
 
 \item{correctVals}{a vector of two values that specifies the "correct" value (index 1) and the "incorrect" value (index 2). e.g, c("yes", "no"). DEFAULT = c(TRUE, FALSE)}
 
-\item{dataOverlapCol}{A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"
+\item{dataOverlapCol}{A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"}
+
+\item{splitByCorrect}{A boolean that specifies whether to use the "correct/incorrect" column as a grouping variable for the RT data. DEFAULT = TRUE.
 '}
 }
 \value{

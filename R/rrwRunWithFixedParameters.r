@@ -28,8 +28,10 @@ rrwRunWithFixedParameters <- function(data, rrwModelList, minN = 20, dataOverlap
     fileTag <- paste(format(Sys.time(), "%b_%d_%Y_%H-%M"), "RRW", sep="_")
   }
 
+  #get grouping columns from modelList
+  grpCols <- getGroupColsFromModelList(rrwModelList)
   #collapse data
-  df.raw <- rrwRawDataToRRWFormatData(data, rrwModelList, dataRtCol, correctCol,correctVals, dataOverlapCol)
+  df.raw <- rrwRawDataToRRWFormatData(data, grpCols, dataRtCol, correctCol,correctVals, dataOverlapCol)
   #add coded columns
   df.raw <- rrwGetAllCodeColumns(df.raw, rrwModelList)
 

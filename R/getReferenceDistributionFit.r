@@ -28,6 +28,7 @@
 #' @param onlyMinimizeOnPhvoFit A boolean that specifies whether to minimize the function only on the fit of the p(HVO) data (if set to TRUE).  If set to false, the function will be minimized on the basis of both the fit of the p(HVO) and RT data.  DEFAULT = FALSE.
 #' @param splitByRefDist A boolean that specifies whether to group the dataset by those trial that are above the reference distribution and those that are below the reference distribution.  DEFAULT = TRUE.
 #' @param fitByRefDist A boolean that specifies whether fit the p(HVO) and RT functions by the grouping created when splitByRefDist = TRUE. If splitByRefDist = FALSE, then this argument is irrelevant. Generally, you want splitByRefDist = TRUE and  fitByRefDist = FALSE to find a reference distribution that fits an unbiased observer for a particular condition in your experiment and then see how your manipulations influence either another reference distribution or the response biases in the RRW.  DEFAULT = FALSE.
+#' @param splitByCorrect A boolean that specifies whether to use the "correct/incorrect" column as a grouping variable for the RT data when fitting the RT function. When set to FALSE, the RT function will be fit to the collapsed correct and incorrect responses. DEFAULT = TRUE.
 #' @param overlapOutFile A string that identifies the name of file (.txt) in which the overlap information will be saved. The default is NULL, whereby the overlap information will not be saved.
 #' @param figureOutFile A string that identifies the name of file (.pdf) in which the p(HVO) and RT fits will be graphed. The default is NULL, whereby the figures will not be saved.
 #' @param sinkFilename A string that identifies the name of file (.txt) in which the fit statistics will be saved. The default is NULL, whereby the fit statistics will not be saved.
@@ -38,7 +39,7 @@
 #' @export
 #' @examples getReferenceDistributionFit (df.choiceDat=moralsData, df.valueDat = allValues, rdN=100, rdMean=3, rdSD=1, item1cols = "Item1", item2cols = "Item2", respChoiceCol = "keyDef", respChoiceVal = c("Yes", "No"), RTcol = "res.rt",chanceThreshold = 0.5,  lowRTquantileThreshold = 0.025, highRTquantileThreshold = 0.975, minOverlapN = 20, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, numOverlapBins = 10, overlapNumRuns = 1000, overlapBootstrapMulticore = TRUE, overlapOutFile = "overlaps.txt", sinkFilename = "FitResults.txt", combFun = ch.maxAveComb, probMax = 0.5)
 
-getReferenceDistributionFit <- function(df.choiceDat, df.valueDat, rdN, rdMean, rdSD, refDistGenFn = rnorm, item1cols, item2cols, respChoiceCol, respChoiceVal, RTcol, chanceThreshold = 0, lowRTquantileThreshold = 0, highRTquantileThreshold = 0, minOverlapN = 0, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, numOverlapBins = 10, overlapNumRuns = 1000, overlapBootstrapMulticore = FALSE, useTwoParameterModel = FALSE, onlyMinimizeOnPhvoFit = FALSE, splitByRefDist = TRUE, fitByRefDist = FALSE, overlapOutFile = NULL, figureOutFile = NULL, sinkFilename = NULL, combFun = ch.maxAveComb, ...) {
+getReferenceDistributionFit <- function(df.choiceDat, df.valueDat, rdN, rdMean, rdSD, refDistGenFn = rnorm, item1cols, item2cols, respChoiceCol, respChoiceVal, RTcol, chanceThreshold = 0, lowRTquantileThreshold = 0, highRTquantileThreshold = 0, minOverlapN = 0, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, numOverlapBins = 10, overlapNumRuns = 1000, overlapBootstrapMulticore = FALSE, useTwoParameterModel = FALSE, onlyMinimizeOnPhvoFit = FALSE, splitByRefDist = TRUE, fitByRefDist = FALSE, splitByCorrect = TRUE, overlapOutFile = NULL, figureOutFile = NULL, sinkFilename = NULL, combFun = ch.maxAveComb, ...) {
 
   #generate reference distribution.
   refDist <- refDistGenFn (n = rdN, mean = rdMean, sd = rdSD)
@@ -67,7 +68,7 @@ getReferenceDistributionFit <- function(df.choiceDat, df.valueDat, rdN, rdMean, 
   grpColsFit <- NULL
   condCol <- NULL
   if(splitByRefDist) {
-    df.out2$refValue<-ifelse(df.out2$dirOverlap < 0, "refHVO", "refLVO")
+    df.out2$refValue<-ifelse(df.out2$dirOverlap <= 0, "refHVO", "refLVO")
     grpColSplit <- "refValue"
     condCol <- "refValue"
     if(fitByRefDist) {
@@ -75,8 +76,17 @@ getReferenceDistributionFit <- function(df.choiceDat, df.valueDat, rdN, rdMean, 
     }
   }
 
-  df.out3 <- rrwRawDataToRRWFormatData(df.out2, grpColSplit, dataRtCol = RTcol, correctCol = "correct", correctVals = c(1,0), dataOverlapCol= "overlapRound")
-  regFits <- getPredictedRTpHVOfitByGroup(df.out3, grpColsFit,RTcol = RTcol, overlapRoundCol="overlapRound", minNperOverlap = minOverlapN, useTwoParameterModel = useTwoParameterModel)
+  df.out3 <- rrwRawDataToRRWFormatData(df.out2, grpColSplit, dataRtCol = RTcol, correctCol = "correct", correctVals = c(1,0), dataOverlapCol= "overlapRound", splitByCorrect = splitByCorrect)
+
+  if(splitByCorrect) {
+    correctCol = "correct"
+    correctVals = c(TRUE, FALSE)
+  } else {
+    correctCol = NULL
+    correctVals = NULL
+  }
+
+  regFits <- getPredictedRTpHVOfitForRefDist(df.out3, grpCols = NULL,RTcol = "rt", pHVOcol = "pHit", overlapRoundCol="overlapRound", refDistCol = grpColsFit, correctCol = correctCol, correctVals = correctVals, nCol = "n", minNperOverlap = minOverlapN, useTwoParameterModel = useTwoParameterModel)
 
   #get the fit statistics
   if(onlyMinimizeOnPhvoFit) {
@@ -85,9 +95,18 @@ getReferenceDistributionFit <- function(df.choiceDat, df.valueDat, rdN, rdMean, 
     out.AIC <- chutils::ch.AIC(as.vector(regFits$data$pHit), as.vector(regFits$data$pHVOfit), pars.n, standardize = FALSE)
 
   } else {
-    out.rss <- getMinR2RRW(as.vector(regFits$data$pHVOfit), as.vector(regFits$data$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), equalizeRTandPhit = equalizeRTandPhit)
-    out.BIC <- getICRRW(as.vector(regFits$data$pHVOfit), as.vector(regFits$data$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
-    out.AIC <- getICRRW(as.vector(regFits$data$pHVOfit), as.vector(regFits$data$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
+    if(!is.null(correctCol)) {
+      pHVOdata <- regFits$data[regFits$data[[correctCol]] == correctVals[1], ]
+    } else {
+      pHVOdata <- regFits$data
+    }
+    out.rss <- getMinR2RRW(as.vector(pHVOdata$pHVOfit), as.vector(pHVOdata$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), equalizeRTandPhit = equalizeRTandPhit)
+    out.BIC <- getICRRW(as.vector(pHVOdata$pHVOfit), as.vector(pHVOdata$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
+    out.AIC <- getICRRW(as.vector(pHVOdata$pHVOfit), as.vector(pHVOdata$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
+  }
+
+  if(splitByCorrect==FALSE) {
+    regFits$data$correct <- TRUE
   }
 
   plotRRWFit2 (regFits$data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "RTfit", pHitFitCol = "pHVOfit", correctCol = "correct", overlapCol = "overlapRound", condCol = condCol, numSimsToPlot = 0, plotFilename = figureOutFile, multiplePlotsPerPage = TRUE, yMinMixRT = NULL)
@@ -113,33 +132,60 @@ getReferenceDistributionFit <- function(df.choiceDat, df.valueDat, rdN, rdMean, 
       cat(" Distribution Shape = ", distShape, "\n\n")
 
       cat("\n\n ******** p(HVO) fit ******** \n\n")
-      for(i in 1:length(regFits$pHVOFit)) {
-        print(summary(regFits$pHVOFit[[i]]$nlsObject))
+      if(length(regFits$pHVOFit) > 0) {
+        for(i in 1:length(regFits$pHVOFit)) {
+          print(summary(regFits$pHVOFit[[i]]$nlsObject))
+        }
+        cat("\n **** p(HVO) R Square **** \n")
+        for(i in 1:length(regFits$pHVOFit)) {
+          print(regFits$pHVOFit[[i]]$r2)
+        }
+      } else {
+        print("NULL")
       }
       cat("\n\n ******** RT fits ******** \n\n")
-      for(i in 1:length(regFits$RTfit)) {
-        print(summary(regFits$RTfit[[i]]))
+      if(length(regFits$RTfit) > 0) {
+        for(i in 1:length(regFits$RTfit)) {
+          print(summary(regFits$RTfit[[i]]$RTObject))
+        }
+        cat("\n **** RT R Square **** \n")
+        for(i in 1:length(regFits$RTfit)) {
+          print(regFits$RTfit[[i]]$r2)
+        }
+      } else {
+        print("NULL")
       }
-      cat("\n\n ******** p(HVO) R Square ******** \n\n")
-      for(i in 1:length(regFits$pHVOFit)) {
-        print(regFits$pHVOFit[[i]]$r2)
-      }
-      cat("\n\n ******** RT R Square ******** \n\n")
-      for(i in 1:length(regFits$RTfit)) {
-        print(summary(regFits$RTfit[[i]])$r.squared)
+      cat("\n\n ******** RT fits LVO ******** \n\n")
+      if(length(regFits$RTfitLVO) > 0) {
+        for(i in 1:length(regFits$RTfitLVO)) {
+          print(summary(regFits$RTfitLVO[[i]]$RTObject))
+        }
+        cat("\n **** RT LVO R Square **** \n")
+        for(i in 1:length(regFits$RTfit)) {
+          print(regFits$RTfit[[i]]$r2)
+        }
+      } else {
+        print("NULL")
       }
 
       cat("\n\n ******** Model Fit Statistics ******** \n\n")
       cat(" Only minimize the function based on the fit of p(HVO) = ", onlyMinimizeOnPhvoFit, "\n")
       cat(" Use two parameter model when fitting p(HVO) function = ", useTwoParameterModel, "\n")
       cat(" Split data by reference distribution (create refHVO and refLVO) = ", splitByRefDist, "\n")
-      cat(" Fit separate functions for refHVO and refLVO  = ", fitByRefDist, "\n\n")
+      cat(" Fit separate functions for refHVO and refLVO (beta for p(HV0) and slope for RT don't vary) = ", fitByRefDist, "\n")
+      cat(" Split data by correct/incorrect when fitting the RT function = ", splitByCorrect, "\n\n")
       cat(" N Parameters = ", pars.n, "\n")
       cat(" Overall R Square = ", 1 - out.rss, "\n")
       cat(" BIC = ", out.BIC, "\n")
       cat(" AIC = ", out.AIC, "\n")
       cat("\n Equalize pHit and RT = ", equalizeRTandPhit, "\n\n")
       cat("\n\n ******** Overlap Bins ******** \n\n")
+      if(!is.null(roundThreshold)) {
+        cat(" Round Threshold: ", roundThreshold, "\n")
+      }
+      if(!is.null(numOverlapBins)) {
+        cat(" Number of Overlap Bins: ", numOverlapBins, "\n\n")
+      }
       print(sort(unique(regFits$data$overlapRound)))
     sink(NULL)
   }

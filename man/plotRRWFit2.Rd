@@ -16,7 +16,9 @@ plotRRWFit2(
   numSimsToPlot = 0,
   plotFilename = NULL,
   multiplePlotsPerPage = TRUE,
-  yMinMixRT = NULL
+  yMinMixRT = NULL,
+  xMinMax = NULL,
+  combineRThvoRTlvo = FALSE
 )
 }
 \arguments{
@@ -43,6 +45,8 @@ plotRRWFit2(
 \item{multiplePlotsPerPage}{A boolean that identifies whether to print multiple plots per page.  DEFAULT = TRUE.}
 
 \item{yMinMixRT}{A vector of 2 numbers that identifies the c(min, max) for the y-axis of the RT graph. If not entered, then the function will calculate a pretty min and max. DEFAULT = NULL.}
+
+\item{xMinMixRT}{A vector of 2 numbers that identifies the c(min, max) for the x-axis (overlap). DEFAULT = c(0,1).}
 }
 \value{
 .

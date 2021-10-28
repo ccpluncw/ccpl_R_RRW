@@ -28,13 +28,14 @@
 #' @param onlyMinimizeOnPhvoFit A boolean that specifies whether to minimize the function only on the fit of the p(HVO) data (if set to TRUE).  If set to false, the function will be minimized on the basis of both the fit of the p(HVO) and RT data.  DEFAULT = FALSE.
 #' @param splitByRefDist A boolean that specifies whether to group the dataset by those trial that are above the reference distribution and those that are below the reference distribution.  DEFAULT = TRUE.
 #' @param fitByRefDist A boolean that specifies whether fit the p(HVO) and RT functions by the grouping created when splitByRefDist = TRUE. If splitByRefDist = FALSE, then this argument is irrelevant. Generally, you want splitByRefDist = TRUE and  fitByRefDist = FALSE to find a reference distribution that fits an unbiased observer for a particular condition in your experiment and then see how your manipulations influence either another reference distribution or the response biases in the RRW.  DEFAULT = FALSE.
+#' @param splitByCorrect A boolean that specifies whether to use the "correct/incorrect" column as a grouping variable for the RT data when fitting the RT function. When set to FALSE, the RT function will be fit to the collapsed correct and incorrect responses. DEFAULT = TRUE.
 #' @param combFun If there are multiple items contributing to a single distribution, this function describes how the values will be combined across items in both the X and Y distributions. The function must combine elements of a list that might be of different different lengths. The default just flattens the list into one large vector.  DEFAULT = ch.maxAveComb  (with probMax = 0.5)
 #' @keywords assess reference distribution fit
 #' @return The minimization statistic for the fit of the model to the RT and pHit (proportion crossed each boundary) data.  This is the value that will be miniized by the optimization program.
 #' @export
 #' @examples rrwAssessComparisonDistribitionFit (df.choiceDat=moralsData, df.valueDat = allValues, rdN=100, rdMean=3, rdSD=1, item1cols = "Item1", item2cols = "Item2", respChoiceCol = "keyDef", respChoiceVal = c("Yes", "No"), RTcol = "res.rt",chanceThreshold = 0.5,  lowRTquantileThreshold = 0.025, highRTquantileThreshold = 0.975, minOverlapN = 20, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, numOverlapBins = 10, overlapNumRuns = 1000, combFun = ch.maxAveComb, probMax = 0.5)
 
-rrwAssessComparisonDistribitionFit <- function (df.choiceDat, df.valueDat, rdN, rdMean, rdSD, refDistGenFn = rnorm, item1cols, item2cols, respChoiceCol, respChoiceVal, RTcol, chanceThreshold = 0, lowRTquantileThreshold = 0, highRTquantileThreshold = 0, minOverlapN = 0, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, numOverlapBins = 10, overlapNumRuns = 1000, overlapBootstrapMulticore = FALSE, useTwoParameterModel = FALSE, onlyMinimizeOnPhvoFit = FALSE, splitByRefDist = TRUE, fitByRefDist = FALSE, combFun = ch.maxAveComb, ...) {
+rrwAssessComparisonDistribitionFit <- function (df.choiceDat, df.valueDat, rdN, rdMean, rdSD, refDistGenFn = rnorm, item1cols, item2cols, respChoiceCol, respChoiceVal, RTcol, chanceThreshold = 0, lowRTquantileThreshold = 0, highRTquantileThreshold = 0, minOverlapN = 0, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, numOverlapBins = 10, overlapNumRuns = 1000, overlapBootstrapMulticore = FALSE, useTwoParameterModel = FALSE, onlyMinimizeOnPhvoFit = FALSE, splitByRefDist = TRUE, fitByRefDist = FALSE, splitByCorrect = TRUE, combFun = ch.maxAveComb, ...) {
 
   #make sure minimizeStat is valid
   minimizeOpts <- c("BIC", "AIC", "R_Square")
@@ -70,15 +71,24 @@ rrwAssessComparisonDistribitionFit <- function (df.choiceDat, df.valueDat, rdN, 
     grpColSplit <- NULL
   	grpColsFit <- NULL
   	if(splitByRefDist) {
-      df.out2$refValue<-ifelse(df.out2$dirOverlap < 0, "refHVO", "refLVO")
+      df.out2$refValue<-ifelse(df.out2$dirOverlap <= 0, "refHVO", "refLVO")
   		grpColSplit <- "refValue"
       if(fitByRefDist) {
     		grpColsFit <- "refValue"
     	}
   	}
 
-  	df.out3 <- rrwRawDataToRRWFormatData(df.out2, grpColSplit, dataRtCol = RTcol, correctCol = "correct", correctVals = c(1,0), dataOverlapCol= "overlapRound")
-  	regFits <- getPredictedRTpHVOfitByGroup(df.out3, grpColsFit,RTcol = RTcol, overlapRoundCol="overlapRound", minNperOverlap = minOverlapN, useTwoParameterModel = useTwoParameterModel)
+  	df.out3 <- rrwRawDataToRRWFormatData(df.out2, grpColSplit, dataRtCol = RTcol, correctCol = "correct", correctVals = c(1,0), dataOverlapCol= "overlapRound", splitByCorrect = splitByCorrect)
+
+    if(splitByCorrect) {
+      correctCol = "correct"
+      correctVals = c(TRUE, FALSE)
+    } else {
+      correctCol = NULL
+      correctVals = NULL
+    }
+
+    regFits <- getPredictedRTpHVOfitForRefDist(df.out3, grpCols = NULL,RTcol = "rt", pHVOcol = "pHit", overlapRoundCol="overlapRound", refDistCol = grpColsFit, correctCol = correctCol, correctVals = correctVals, nCol = "n", minNperOverlap = minOverlapN, useTwoParameterModel = useTwoParameterModel)
 
     #get the fit statistics
     if(onlyMinimizeOnPhvoFit) {
@@ -87,9 +97,14 @@ rrwAssessComparisonDistribitionFit <- function (df.choiceDat, df.valueDat, rdN, 
       out.AIC <- chutils::ch.AIC(as.vector(regFits$data$pHit), as.vector(regFits$data$pHVOfit), pars.n, standardize = FALSE)
 
     } else {
-      out.rss <- getMinR2RRW(as.vector(regFits$data$pHVOfit), as.vector(regFits$data$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), equalizeRTandPhit = equalizeRTandPhit)
-      out.BIC <- getICRRW(as.vector(regFits$data$pHVOfit), as.vector(regFits$data$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
-      out.AIC <- getICRRW(as.vector(regFits$data$pHVOfit), as.vector(regFits$data$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
+      if(!is.null(correctCol)) {
+        pHVOdata <- regFits$data[regFits$data[[correctCol]] == correctVals[1], ]
+      } else {
+        pHVOdata <- regFits$data
+      }
+      out.rss <- getMinR2RRW(as.vector(pHVOdata$pHVOfit), as.vector(pHVOdata$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), equalizeRTandPhit = equalizeRTandPhit)
+      out.BIC <- getICRRW(as.vector(pHVOdata$pHVOfit), as.vector(pHVOdata$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "BIC")
+      out.AIC <- getICRRW(as.vector(pHVOdata$pHVOfit), as.vector(pHVOdata$pHit), as.vector(regFits$data$RTfit), as.vector(regFits$data$rt), pars.n, equalizeRTandPhit = equalizeRTandPhit, ICtype = "AIC")
     }
 
 #This sink is for debugging

@@ -13,12 +13,13 @@
 #' @param plotFilename A string that identifies the name of file (.pdf) in which the plot will be saved. The default is NULL, whereby the plot will not be saved.
 #' @param multiplePlotsPerPage A boolean that identifies whether to print multiple plots per page.  DEFAULT = TRUE.
 #' @param yMinMixRT A vector of 2 numbers that identifies the c(min, max) for the y-axis of the RT graph. If not entered, then the function will calculate a pretty min and max. DEFAULT = NULL.
+#' @param xMinMixRT A vector of 2 numbers that identifies the c(min, max) for the x-axis (overlap). DEFAULT = c(0,1).
 #' @return .
 #' @keywords RRW random walk plot output fit
 #' @export
 #' @examples plotRRWFit (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")
 
-plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap", condCol = NULL, numSimsToPlot = 0, plotFilename = NULL, multiplePlotsPerPage = TRUE, yMinMixRT = NULL) {
+plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap", condCol = NULL, numSimsToPlot = 0, plotFilename = NULL, multiplePlotsPerPage = TRUE, yMinMixRT = NULL, xMinMax = NULL, combineRThvoRTlvo = FALSE) {
 
 
   #set up plot parameters
@@ -40,7 +41,13 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
     if(is.null(yMinMixRT)) {
       yMinMixRT <- chutils::ch.getPlotAxisMinMax(data[[dataRtCol]])
     }
-    xLims <- c(min(data[[overlapCol]]), max(data[[overlapCol]]))
+    if(is.null(xMinMax)) {
+      minX <- ifelse(min(data[[overlapCol]]) < 0, min(data[[overlapCol]]), 0)
+      maxX <- ifelse(max(data[[overlapCol]]) > 1, max(data[[overlapCol]]), 1.0)
+      xLims <- c(minX, maxX)
+    } else {
+      xLims <- xMinMax
+    }
 
 
   #get conditions and number of conditions
@@ -120,6 +127,28 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
         }
       }
 
+      #if combining HVO and LVO, then draw LVO simulations before you draw the HVO datapoints
+      if(combineRThvoRTlvo == TRUE) {
+        if(numSimsToPlot > 0) {
+          for(cnd in 1:conds.n) {
+            if(!is.null(condCol)) {
+              df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
+            } else {
+              df.tmp <- data[ data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
+            }
+
+            plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
+            lty <- df.legend[cnd,"lty"]
+
+            #add background Simulation lines
+            for(i in 1: numSimsToPlot) {
+              rtColTmp <- paste(rtFitCol,i,sep="")
+              lines(df.tmp[[overlapCol]], df.tmp[[rtColTmp]], col=gray(simGrey), lty="solid", lwd = 1)
+            }
+          }
+        }
+      }
+
       for(cnd in 1:conds.n) {
         if(!is.null(condCol)) {
           df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == TRUE & !is.na(data[[dataRtCol]]), ]
@@ -135,9 +164,11 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
         lines(df.tmp[[overlapCol]], df.tmp[[rtFitCol]], col=plotCol, lty=lty, lwd = lwd)
       }
 
-    #create empty plot for RT_LVO
-    plot(NA, ylim=yMinMixRT, xlim = xLims, xlab = NULL, ylab=NA)
+    #if you are not combining HVO and LVO, then create empty plot for RT_LVO
+    if(combineRThvoRTlvo == FALSE) {
+      plot(NA, ylim=yMinMixRT, xlim = xLims, xlab = NULL, ylab=NA)
 
+      #draw the LVO simulations now
       if(numSimsToPlot > 0) {
         for(cnd in 1:conds.n) {
           if(!is.null(condCol)) {
@@ -156,6 +187,11 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
           }
         }
       }
+    } else {
+      #if you are combining the HVO and LVO, then change the LVO symbol to an X
+      pchTmp <- 4
+      pointCEXsize <- 0.5
+    }
 
       for(cnd in 1:conds.n) {
         if(!is.null(condCol)) {

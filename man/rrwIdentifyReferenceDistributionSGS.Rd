@@ -30,6 +30,7 @@ rrwIdentifyReferenceDistributionSGS(
   onlyMinimizeOnPhvoFit = FALSE,
   splitByRefDist = TRUE,
   fitByRefDist = FALSE,
+  splitByCorrect = TRUE,
   numLoops = 200,
   numIntervals = 25,
   optParamListN = 10,
@@ -86,6 +87,8 @@ rrwIdentifyReferenceDistributionSGS(
 \item{splitByRefDist}{A boolean that specifies whether to group the dataset by those trial that are above the reference distribution and those that are below the reference distribution.  DEFAULT = TRUE.}
 
 \item{fitByRefDist}{A boolean that specifies whether fit the p(HVO) and RT functions by the grouping created when splitByRefDist = TRUE. If splitByRefDist = FALSE, then this argument is irrelevant. Generally, you want splitByRefDist = TRUE and  fitByRefDist = FALSE to find a reference distribution that fits an unbiased observer for a particular condition in your experiment and then see how your manipulations influence either another reference distribution or the response biases in the RRW.  DEFAULT = FALSE.}
+
+\item{splitByCorrect}{A boolean that specifies whether to use the "correct/incorrect" column as a grouping variable for the RT data when fitting the RT function. When set to FALSE, the RT function will be fit to the collapsed correct and incorrect responses. DEFAULT = TRUE.}
 
 \item{numLoops}{An integer that specifies the number of loops with different parameter values to be searched in each run of the smartGridSearch before the best fits for that run are identified. DEFAULT = 200.}
 

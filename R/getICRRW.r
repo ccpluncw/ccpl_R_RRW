@@ -27,12 +27,20 @@ getICRRW <- function (simPhit, dataPhit, simRT, dataRT, numParameters, equalizeR
 
       #First remove the influence of the number of observations from the pHit rss by dividing by n.
     pHit.rss <- chutils::ch.RSS(dataPhit, simPhit, standardize = FALSE)
+    #if pHit function is not fit, then IC should be infinite
+    if(is.na(pHit.rss)) {
+      pHit.rss <- Inf
+    }
       #get length without NAs
     pHit.n <- length(dataPhit[!is.na(dataPhit)])
     pHit.ave.rss <- pHit.rss/pHit.n
 
       #and the rt rss
     rt.rss <- chutils::ch.RSS(dataRT, simRT, standardize = FALSE)
+    #if RT function is not fit, then IC should be infinite
+    if(is.na(rt.rss)) {
+      rt.rss <- Inf
+    }
       #get length without NAs
     rt.n <- length(dataRT[!is.na(dataRT)])
     rt.ave.rss <- rt.rss/rt.n
