@@ -34,6 +34,7 @@ rrwRunSmartGridSearch <- function(data, rrwModelList, minN = 20, dataOverlapCol 
     fileTag <- paste(format(Sys.time(), "%b_%d_%Y_%H-%M"), "RRW", sep="_")
   }
 
+
   #get grouping columns from modelList
   grpCols <- getGroupColsFromModelList(rrwModelList)
   #collapse data
