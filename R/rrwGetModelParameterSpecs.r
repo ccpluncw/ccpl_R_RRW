@@ -42,9 +42,9 @@ rrwGetModelParameterSpecs <- function (rrwModelList, startPars.n = 1) {
         tmpL <- rrwModelList[[i]][[j]]$parameterLow
         names(tmpL) <- rrwModelList[[i]][[j]]$ParameterName
         xL <- c(xL, tmpL)
-        tmp <- rrwModelList[[i]][[1]]$parameterInt
-        names(tmp) <- rrwModelList[[i]][[j]]$ParameterName
-        xI <- c(xI, tmp)
+        tmpI <- rrwModelList[[i]][[j]]$parameterInt
+        names(tmpI) <- rrwModelList[[i]][[j]]$ParameterName
+        xI <- c(xI, tmpI)
 
         #if the high > low, then it is a free parameter, so add 1 to pars.n
         pars.n <- ifelse (tmpH > tmpL, pars.n + 1, pars.n)
