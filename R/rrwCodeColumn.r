@@ -27,9 +27,12 @@ rrwCodeColumn <- function(data,rrwModelList) {
 
     #code the first condition, make all the rest equal to the default
     data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[1,1]))), rrwModelList$df.code[1,2], rrwModelList$df.code[numConds,2]))
-    #now, change each other condition from the default to the appropriate code (one at a time)
-    for(i in 2:(numConds -1)) {
-      data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[i,1]))), rrwModelList$df.code[i,2], data[[rrwModelList$columnName]]))
+    #if there are more than 2 conditions
+    if(numConds > 2) {
+      #now, change each other condition from the default to the appropriate code (one at a time)
+      for(i in 2:(numConds -1)) {
+        data[[rrwModelList$columnName]] <- with(data,ifelse(eval(parse(text = as.character(rrwModelList$df.code[i,1]))), rrwModelList$df.code[i,2], data[[rrwModelList$columnName]]))
+      }
     }
   }
   #return the coded data with the added column
