@@ -25,7 +25,7 @@
 #' @param pars.n A number specifying the number of free parameters in the model.  Use this when you are fixing the values of some parameters, but those fixed values are not the default values of the parameters.  Otherwise, the number of free parameters will be automatically caluculated. Default is NULL (automatically calculate).
 #' @param equalizeRTandPhit A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the influence of the pHit and RT is equalized in the minimization statistic. If it is set to FALSE, then the the minimazation statistic is calculated as usual. DEFAULT = FALSE.
 #''
-#' @return A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
+#' @return The function returns a list containing (1) a list of the parameter values and fit statistics [runStats], and (2) a dataframe [df.fitted] that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
 #' @keywords RRW random walk plot output fit
 #' @export
 #' @examples getRRWfit (data, b=14, s=0.1, loopsPerRWstep = 2000, sinkFilename = "outStats.txt")
@@ -181,5 +181,44 @@ getMeanRRWfit <- function(data, b, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NUL
     sink(NULL)
   }
 
-  return(df.fitted)
+  fitStats <- list(AIC = out.AIC.final, BIC = out.BIC.final, r2 = 1 - out.rss.final)
+  ter <- list(ter = coef(Q50.lm)[1])
+  if(!is.null(bCols)) {
+    boundary <- list(columns = bCols, values = b)
+  } else {
+    boundary <- list(columns = "b", values = b)
+  }
+  if(!is.null(sCols)) {
+    StartValue <- list(columns = sCols, values = s)
+  } else {
+    StartValue <- list(columns = "s", values = s)
+  }
+  if(!is.null(nSDCols)) {
+    NoiseSD <- list(columns = nSDCols, values = nSD)
+  } else {
+    NoiseSD <- list(columns = "nSD", values = nSD)
+  }
+  if(!is.null(dbCols)) {
+    DecayBeta <- list(columns = dbCols, values = db)
+  } else {
+    DecayBeta <- list(columns = "db", values = db)
+  }
+  if(!is.null(daCols)) {
+    DecayAsymptote <- list(columns = daCols, values = da)
+  } else {
+    DecayAsymptote <- list(columns = "da", values = da)
+  }
+  if(!is.null(vcCols)) {
+    ValueChange <- list(columns = vcCols, values = vc)
+  } else {
+    ValueChange <- list(columns = "vc", values = vc)
+  }
+
+  runInfo <- list(freeParameters = pars.n, numSimRuns = numSimsToAverage, equalizePhitRT = equalizeRTandPhit)
+  parameters <- list(ter = ter, b = boundary, s = StartValue, nSD = NoiseSD, db = DecayBeta, da = DecayAsymptote, vc = ValueChange)
+  runStats <- list(parameters = parameters, fitStats = fitStats, runInfo = runInfo)
+
+  outlist <- list(df.fitted = df.fitted, runStats = runStats)
+
+  return(outlist)
 }

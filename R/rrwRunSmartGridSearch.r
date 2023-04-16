@@ -22,7 +22,7 @@
 #' @param fileTag A string that is appended to the name of files to identify the analysis and experiment. The default is NULL, whereby the filetag will just be based on a timestamp.
 #' @param numSimsToAverage A number specifying how many simulation runs are in the dataset and should be averaged together to get the final fit. Default is 10
 #''
-#' @return Several files are saved, including <fileTag>GridOut.txt (which contains the best 10 parameter fits), <fileTag>rrwData.txt (which contains the inputData), <fileTag>FitResults.txt (which contains the final parameter fits), <fileTag>Fitted.txt (which contains the input data + simulation fit data). The function returns a dataframe containing the input data with the best fit prediction based on the parameter values.
+#' @return Several files are saved, including <fileTag>GridOut.txt (which contains the best 10 parameter fits), <fileTag>rrwData.txt (which contains the inputData), <fileTag>FitResults.txt (which contains the final parameter fits), <fileTag>Fitted.txt (which contains the input data + simulation fit data). The function returns a list containing (1) a list of the parameter values and fit statistics [runStats], and (2) a dataframe containing the input data with the best fit prediction based on the parameter values [df.fitted].
 #' @keywords RRW smartGridSearch run
 #' @export
 #' @examples rrwRunSmartGridSearch(tmp.df, tmpModelList, minN = 40, dataOverlapCol = "overlapRound", RwSamplesCol = "Q50", dataRtCol = "rt", correctCol = "correct01", correctVals = c(1,0), loopsPerRWstep = 200, minimizeStat = 'BIC', equalizeRTandPhit = TRUE, numLoops = 2500, numIntervals = 100, optParamListN = 10, optBoundLoops = 10, multicore = TRUE, multicorePackages = c('RRW'), numSimsToAverage = 40, fileTag = NULL)
@@ -43,8 +43,9 @@ rrwRunSmartGridSearch <- function(data, rrwModelList, minN = 20, dataOverlapCol 
   df.raw <- rrwGetAllCodeColumns(df.raw, rrwModelList)
 
   #remove low n conditions
-  df.raw$rt <- ifelse(df.raw$n < minN, NA, df.raw$rt)
-  df.raw$pHit <- ifelse(df.raw$n < minN, NA, df.raw$pHit)
+  df.raw <- filterRRWdataMinN(df.raw, grpCols, "rt", "pHit", "n",dataOverlapCol,  minN)
+  #df.raw$rt <- ifelse(df.raw$n < minN, NA, df.raw$rt)
+  #df.raw$pHit <- ifelse(df.raw$n < minN, NA, df.raw$pHit)
   #output the rrwData to a file
   filename <- paste(fileTag,"rrwData.txt")
   write.table(df.raw, filename, col.names=T, row.names=F, quote=F, sep="\t")
@@ -104,7 +105,8 @@ rrwRunSmartGridSearch <- function(data, rrwModelList, minN = 20, dataOverlapCol 
   filename <- paste(fileTag,"x.in.RData")
   save(x.in, file=filename)
   #run the RRW to get the fit given the parameters output by the smartGridSearch
-  df.fitted <- do.call(getMeanRRWfit, x.in)
+  run.list <- do.call(getMeanRRWfit, x.in)
+  df.fitted <-run.list$df.fitted
   #save the fit data
   filename <- paste(fileTag,"Fitted.txt")
   write.table(df.fitted, filename, col.names=T, row.names=F, quote=F, sep="\t")
@@ -114,5 +116,5 @@ rrwRunSmartGridSearch <- function(data, rrwModelList, minN = 20, dataOverlapCol 
     cat("\n Minimization Statistic = ", minimizeStat, "\n")
   sink(NULL)
 
-  return(df.fitted)
+  return(run.list)
 }

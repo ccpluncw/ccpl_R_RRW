@@ -14,7 +14,7 @@ rrwRunWithFixedParameters(
   correctCol = "correct",
   correctVals = c(TRUE, FALSE),
   loopsPerRWstep = 200,
-  minimizeStat = "R_Square",
+  minimizeStat = "BIC",
   equalizeRTandPhit = FALSE,
   pars.n = NULL,
   fileTag = NULL,
@@ -53,7 +53,7 @@ rrwRunWithFixedParameters(
 '}
 }
 \value{
-Several files are saved, including <fileTag>rrwData.txt (which contains the inputData), <fileTag>FitResults.txt (which contains the final parameter fits), <fileTag>Fitted.txt (which contains the input data + simulation fit data). The function returns a dataframe containing the input data with the best fit prediction based on the parameter values.
+Several files are saved, including <fileTag>rrwData.txt (which contains the inputData), <fileTag>FitResults.txt (which contains the final parameter fits), <fileTag>Fitted.txt (which contains the input data + simulation fit data). The function returns a list containing (1) a list of the parameter values and fit statistics [runStats], and (2) a dataframe containing the input data with the best fit prediction based on the parameter values [df.fitted].
 }
 \description{
 Function that runs a set of fixed parameters (specified in a rrwModelList) to generate the fits to the data.
