@@ -13,12 +13,16 @@ getPredictedRRWpoints(
   RwSamplesCol,
   dataOverlapCol,
   b,
+  boundaryChangeSensitivity = 0.25,
+  Ter = 0,
   startValue = 0,
   noiseSD = 0,
   decayBeta = 0,
   decayAsymptote = 0.2,
   valueChange = 0,
   bCols = NULL,
+  bcsCols = NULL,
+  TerCols = NULL,
   sCols = NULL,
   nSDCols = NULL,
   dbCols = NULL,
@@ -44,6 +48,8 @@ getPredictedRRWpoints(
 
 \item{b}{A vector of number(s) specifying the boundary distance from a 0 startpoint. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of b. The column names must be specified in the "bCols" argument. b is specific to the RRW simulation and has no default value}
 
+\item{Ter}{A vector of positive values that adjusts the time of encoding/response (non-decision time). If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect/dummy coded, because the values contained in this column will be multiplied by the value of Ter. All effect/dummy codes must >=0. The column names must be specified in the "TerCols" argument. When Ter = 0, a single, best fitting Ter will be calculated. Use this parameter when you have several conditions and you hypothesize that some conditions should have a larger Ter than others.  For example, this may model longer encoding process when different numbers of items are on the screen for different conditions. The hypothetical fastest condition should have Ter = 0, which simply indicates that the RRW program will find the best fit Ter. The slower conditions will have larger Ter values and will be fit ralative to the fastest condition. The change in samples resulting from the Ter effect is a function of the size of the boundary (Ter * boundary). Default = 0, This is still experimental.}
+
 \item{startValue}{A vector of signed number(s) between -1 and 1 that indicates the position of the start point as a proportion of the boundary value.   If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of startValue. The column names must be specified in the "sCols" argument. startValue = 0 is the default and represents an unbiased start point.}
 
 \item{noiseSD}{A vector of positive number(s) representing the SD of the noise distribution.  The noise distribution is N(0,nSD) and is added to the value of every step.  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of noiseSD. The column names must be specified in the "nSDCols" argument. noiseSD = 0 is the default and represents no noise being added to each step.}
@@ -56,6 +62,10 @@ getPredictedRRWpoints(
 
 \item{bCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of boundary (b).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of b.}
 
+\item{bcsCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the boundaryChangeSensitivity (bcs).  These columns must be effect coded, because the values contained in this column will be multiplied by the value of bcs. All effect/dummy codes must be >=0.}
+
+\item{TerCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the non-decision time (Ter).  These columns should be effect/dummy coded, because the values contained in this column will be multiplied by the value of Ter.  All effect/dummy codes must be >=0.}
+
 \item{sCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of startValue (startValue).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of startValue.}
 
 \item{nSDCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of noiseSD (noiseSD).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of noiseSD.}
@@ -67,6 +77,8 @@ getPredictedRRWpoints(
 \item{vcCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (valueChange).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.}
 
 \item{loops}{A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.}
+
+\item{bcs}{A vector of positive values that specify the likelihood that the boundary will be reduced because there it is taking too many samples before reaching a threshold. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect/dummy coded, because the values contained in this column will be multiplied by the value of b. All effect/dummy codes must >=0. The column names must be specified in the "bcsCols" argument. Essentially, this models a decision-maker reducing the amount of information that they need before a response because it is taking to long.  The boundary reduces when there is little change in the likelihood of a response after N number of steps.  The routine makes this determination as a function of the size of the unaltered boundary (boundaryChangeSensitivity * boundary). Small values (e.g., 0.1), result in an impatient person (relatively early chnage in the boundary values).  Large values (e.g., 0.9), result in a patient person (a boundary that is relatively resistent to change.  A value of 0 is an exception: it will result in no boundary reduction under any circumstances. Impatience increases the likelihood of an error, so it increases the average time of error responses.  Default is 0.25.}
 }
 \value{
 A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))

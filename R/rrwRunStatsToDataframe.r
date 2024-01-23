@@ -15,6 +15,14 @@ rrwRunStatsToDataframe <- function (runStats) {
   df.boundary.2 <- data.frame(t(df.boundary.1$values))
   colnames(df.boundary.2) <- df.boundary.1$columns
 
+  df.boundaryChangeSensitivity.1 <- runStats$parameters$bcs
+  df.boundaryChangeSensitivity.2 <- data.frame(t(df.boundaryChangeSensitivity.1$values))
+  colnames(df.boundaryChangeSensitivity.2) <- df.boundaryChangeSensitivity.1$columns
+
+  df.Ter.1 <- runStats$parameters$Ter
+  df.Ter.2 <- data.frame(t(df.Ter.1$values))
+  colnames(df.Ter.2) <- df.Ter.1$columns
+
   df.StartValue.1 <- runStats$parameters$s
   df.StartValue.2 <- data.frame(t(df.StartValue.1$values))
   colnames(df.StartValue.2) <- df.StartValue.1$columns
@@ -35,12 +43,12 @@ rrwRunStatsToDataframe <- function (runStats) {
   df.ValueChange.2 <- data.frame(t(df.ValueChange.1$values))
   colnames(df.ValueChange.2) <- df.ValueChange.1$columns
 
-  df.ter.1 <- data.frame(ter = runStats$parameters$ter$ter)
   df.AIC.1 <- data.frame(AIC = runStats$fitStats$AIC)
   df.BIC.1 <- data.frame(BIC = runStats$fitStats$BIC)
   df.r2.1 <- data.frame(r2 = runStats$fitStats$r2)
+  df.nPar.1 <- data.frame(freeParameters = runStats$fitStats$freeParameters)
 
-  df.tmp.stats <- data.frame(df.boundary.2, df.StartValue.2, df.NoiseSD.2, df.DecayBeta.2, df.DecayAsymptote.2, df.ValueChange.2, df.ter.1, df.AIC.1, df.BIC.1, df.r2.1)
+  df.tmp.stats <- data.frame(df.boundary.2, df.boundaryChangeSensitivity.2, df.Ter.2, df.StartValue.2, df.NoiseSD.2, df.DecayBeta.2, df.DecayAsymptote.2, df.ValueChange.2, df.AIC.1, df.BIC.1, df.r2.1, df.nPar.1)
 
   return(df.tmp.stats)
 }

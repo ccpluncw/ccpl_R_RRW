@@ -7,13 +7,15 @@
 getMomentsOfRRW(
   overlap,
   boundary,
-  correctBoundary = 1,
+  boundaryChangeSensitivity = 0.25,
+  Ter = 0,
   stepSize = 1,
   startValue = 0,
   noiseSD = 0,
   decayAsymptote = 0.2,
   decayBeta = 0,
-  loops = 200
+  loops = 200,
+  correctBoundary = 1
 )
 }
 \arguments{
@@ -21,7 +23,9 @@ getMomentsOfRRW(
 
 \item{boundary}{A number specifying the boundary distance from a 0 startpoint. This value is specific to the RRW simulation and has no default value}
 
-\item{correctBoundary}{Either 1 or -1.  If correctBoundary = 1, then the positive boundary is the boundary for a correct response.  If correctBoundary = -1, then the negative boundary is the boundary for a correct response.}
+\item{boundaryChangeSensitivity}{A positive number that adjusts the likelihood that the boundary will be reduced because there it is taking too many samples before reaching a threshold. Essentially, this models a decision-maker reducing the amount of information that they need before a response because it is taking to long.  The boundary reduces when there is little change in the likelihood of a response after N number of steps.  The routine makes this determination as a function of the size of the unaltered boundary (boundaryChangeSensitivity * boundary). Small values (e.g., 0.1), result in an impatient person (relatively early chnage in the boundary values).  Large values (e.g., 0.9), result in a patient person (a boundary that is relatively resistent to change.  A value of 0 is an exception: it will result in no boundary reduction under any circumstances. Impatience increases the likelihood of an error, so it increases the average time of error responses.  Default is 0.25.}
+
+\item{Ter}{A positive number that adjusts the time of encoding/response (non-decision time). When Ter = 0, a single, best fitting Ter will be calculated. Use this parameter when you have several conditions and you hypothesize that some conditions should have a larger Ter than others.  For example, this may model longer encoding process when different numbers of items are on the screen for different conditions. The hypothetical fastest condition should have Ter = 0, which simply indicates that the RRW program will find the best fit Ter. The slower conditions will have larger Ter values and will be fit ralative to the fastest condition. The change in samples resulting from the Ter effect is a function of the size of the boundary (Ter * boundary). Default is 0.0. This is still experimental.}
 
 \item{stepSize}{A number that specifies the granularity that the simulation will generate the probability crossing a boundary.  stepSize = 1 is the Default and most granular.}
 
@@ -34,6 +38,8 @@ getMomentsOfRRW(
 \item{decayBeta}{A signed number representing the beta value in the Information Accrual Bias (IAB). decayBeta = 0 is the default and represents no IAB.}
 
 \item{loops}{A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.}
+
+\item{correctBoundary}{Either 1 or -1.  If correctBoundary = 1, then the positive boundary is the boundary for a correct response.  If correctBoundary = -1, then the negative boundary is the boundary for a correct response.}
 }
 \value{
 A dataframe that contains the moments of the simmulated values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the probability of crossing each boundary); correct (TRUE or FALSE)), along with the parameters of the model.

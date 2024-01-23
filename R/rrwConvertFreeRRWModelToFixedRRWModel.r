@@ -14,8 +14,8 @@ rrwConvertFreeRRWModelToFixedRRWModel <- function(rrwModelList, runStatsList) {
   freeModelParameters <- names(rrwModelList)
 
   for(i in freeModelParameters) {
-    nParamsFree <- length(rrwModelList[i])
-    nParamsFix <- length(fixedParameterList[i])
+    nParamsFree <- length(rrwModelList[[i]])
+    nParamsFix <- length(fixedParameterList[[i]][["columns"]])
     for (j in 1:nParamsFree) {
       #get the column name of each instance of this parameter
       freeColName <- rrwModelList[[i]][[j]][["columnName"]]

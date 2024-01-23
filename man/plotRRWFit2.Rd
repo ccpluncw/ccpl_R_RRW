@@ -18,7 +18,9 @@ plotRRWFit2(
   multiplePlotsPerPage = TRUE,
   yMinMixRT = NULL,
   xMinMax = NULL,
-  combineRThvoRTlvo = FALSE
+  combineRThvoRTlvo = FALSE,
+  maxIntensityChanges = 8,
+  maxHueChanges = 10
 )
 }
 \arguments{
@@ -46,6 +48,12 @@ plotRRWFit2(
 
 \item{yMinMixRT}{A vector of 2 numbers that identifies the c(min, max) for the y-axis of the RT graph. If not entered, then the function will calculate a pretty min and max. DEFAULT = NULL.}
 
+\item{combineRThvoRTlvo}{A boolean that specifies whether to print the RT_HVO and RT_LVO on the same graph (TRUE) or separate graphs (FALSE).  DEFAULT = FALSE.}
+
+\item{maxIntensityChanges}{the maximum number of distinguishable intensity changes. DEFAULT = 8.}
+
+\item{maxHueChanges}{the maximum number of distinguishable hue changes. DEFAULT = 10.}
+
 \item{xMinMixRT}{A vector of 2 numbers that identifies the c(min, max) for the x-axis (overlap). DEFAULT = c(0,1).}
 }
 \value{
@@ -55,7 +63,7 @@ plotRRWFit2(
 Function plots the fitted RRW simulation as a function of the empirical data.  It is generally run after the getRRWfit().
 }
 \examples{
-plotRRWFit (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")
+plotRRWFit2 (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")
 }
 \keyword{RRW}
 \keyword{fit}

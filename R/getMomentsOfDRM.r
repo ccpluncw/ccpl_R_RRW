@@ -15,9 +15,9 @@ getMomentsOfDRM <- function(CDFps, values) {
 
   if( mean(CDFps[trunc((length(CDFps) - length(CDFps)/10)):length(CDFps)]) > 0.005) {
     tryCatch ({
-      tmp.drm <- drc::drm(CDFps ~ values, fct = LL2.3(), robust='mean')
+      tmp.drm <- drc::drm(CDFps ~ values, fct = drc::LL2.3(), robust='mean')
       }, error = function(e) {
-#          print(paste("drm function did not fit - trying alternate method ..."))
+          print(paste("drm function did not fit - trying alternate method ..."))
     })
   }
   if (is.null(tmp.drm)) {
@@ -60,7 +60,7 @@ getMomentsOfDRM <- function(CDFps, values) {
         df.out$Q50 <- NA
         df.out$Q75 <- NA
       }
-      df.out$pCross <- max(fitted(tmp.drm))
+      df.out$pCross <- ifelse(max(fitted(tmp.drm)) > 1, 1, max(fitted(tmp.drm)))
   }
 
   return(df.out)

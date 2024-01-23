@@ -14,12 +14,15 @@
 #' @param multiplePlotsPerPage A boolean that identifies whether to print multiple plots per page.  DEFAULT = TRUE.
 #' @param yMinMixRT A vector of 2 numbers that identifies the c(min, max) for the y-axis of the RT graph. If not entered, then the function will calculate a pretty min and max. DEFAULT = NULL.
 #' @param xMinMixRT A vector of 2 numbers that identifies the c(min, max) for the x-axis (overlap). DEFAULT = c(0,1).
+#' @param combineRThvoRTlvo A boolean that specifies whether to print the RT_HVO and RT_LVO on the same graph (TRUE) or separate graphs (FALSE).  DEFAULT = FALSE.
+#' @param maxIntensityChanges the maximum number of distinguishable intensity changes. DEFAULT = 8.
+#' @param maxHueChanges the maximum number of distinguishable hue changes. DEFAULT = 10.
 #' @return .
 #' @keywords RRW random walk plot output fit
 #' @export
-#' @examples plotRRWFit (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")
+#' @examples plotRRWFit2 (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")
 
-plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap", condCol = NULL, numSimsToPlot = 0, plotFilename = NULL, multiplePlotsPerPage = TRUE, yMinMixRT = NULL, xMinMax = NULL, combineRThvoRTlvo = FALSE) {
+plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap", condCol = NULL, numSimsToPlot = 0, plotFilename = NULL, multiplePlotsPerPage = TRUE, yMinMixRT = NULL, xMinMax = NULL, combineRThvoRTlvo = FALSE, maxIntensityChanges = 8, maxHueChanges = 10) {
 
 
   #set up plot parameters
@@ -56,11 +59,11 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
       conds.n <- length(conds)
       #create plot info and legend info
       df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))
-      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx)
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
     } else {
       conds.n <- 1
       df.grpIdx <- data.frame(cond = "all", idx = c(1))
-      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx)
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
     }
 
     #create empty plot for p(HVO)

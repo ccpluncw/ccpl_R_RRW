@@ -6,17 +6,18 @@
 \usage{
 rrwRawDataToRRWFormatDataOld(
   data,
-  rrwModelList,
+  grpCols = NULL,
   dataRtCol = "rt",
   correctCol = "correct",
   correctVals = c(TRUE, FALSE),
-  dataOverlapCol = "overlapRound"
+  dataOverlapCol = "overlapRound",
+  splitByCorrect = TRUE
 )
 }
 \arguments{
 \item{data}{This is a dataframe containing the raw trial-by-trial data that must contain the following columns: overlap; RT (often a median); the proportion correct/incorrect; whether or not the row specifies a correct or incorrect trial. The dataset can also contains columns that effect code the influence of different parameters.}
 
-\item{rrwModelList}{A list that specifies the rrw model.  Build the rrwModelList useing rrwAddEffectToRRWModel}
+\item{grpCols}{A vector of strings containing the grouping columns. If NULL this argument will be ignored.  DEFAULT = NULL}
 
 \item{dataRtCol}{A string that identifies the name of the column in data that contains the RTs for the specific overlap/correct/condition combination. Default is "rt"}
 
@@ -24,7 +25,9 @@ rrwRawDataToRRWFormatDataOld(
 
 \item{correctVals}{a vector of two values that specifies the "correct" value (index 1) and the "incorrect" value (index 2). e.g, c("yes", "no"). DEFAULT = c(TRUE, FALSE)}
 
-\item{dataOverlapCol}{A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"
+\item{dataOverlapCol}{A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"}
+
+\item{splitByCorrect}{A boolean that specifies whether to use the "correct/incorrect" column as a grouping variable for the RT data. DEFAULT = TRUE.
 '}
 }
 \value{

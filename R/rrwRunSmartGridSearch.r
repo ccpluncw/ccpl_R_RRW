@@ -44,8 +44,7 @@ rrwRunSmartGridSearch <- function(data, rrwModelList, minN = 20, dataOverlapCol 
 
   #remove low n conditions
   df.raw <- filterRRWdataMinN(df.raw, grpCols, "rt", "pHit", "n",dataOverlapCol,  minN)
-  #df.raw$rt <- ifelse(df.raw$n < minN, NA, df.raw$rt)
-  #df.raw$pHit <- ifelse(df.raw$n < minN, NA, df.raw$pHit)
+
   #output the rrwData to a file
   filename <- paste(fileTag,"rrwData.txt")
   write.table(df.raw, filename, col.names=T, row.names=F, quote=F, sep="\t")

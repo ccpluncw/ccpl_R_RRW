@@ -12,7 +12,7 @@ rrwAddParameterEffectListToRRWModel(
 \arguments{
 \item{rrwModelList}{A list that specifies the rrw model.  If you are building a new list, then this should be NULL. If you are adding a new effect to an old list, then this should be the rrwModelList that you are adding an effect to. DEFAULT = NULL}
 
-\item{parameter}{A list that specifies the parameter effect (or a list of effects, e.g., c(effect1, effect2, effect3)).  DEFAULT = NULL
+\item{parameterEffectList}{A list that specifies the parameter effect (or a list of effects, e.g., c(effect1, effect2, effect3)).  DEFAULT = NULL
 '}
 }
 \value{

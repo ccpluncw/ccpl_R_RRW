@@ -14,7 +14,9 @@ rrwPlotSGSoutput(
   correctCol = "correct",
   overlapCol = "overlap",
   fileTag = NULL,
-  numSimsToPlot = 10
+  numSimsToPlot = 10,
+  maxIntensityChanges = 8,
+  maxHueChanges = 10
 )
 }
 \arguments{
@@ -36,7 +38,11 @@ rrwPlotSGSoutput(
 
 \item{fileTag}{A string that is appended to the name of files to identify the analysis and experiment. The default is NULL, whereby the filetag will just be based on a timestamp.}
 
-\item{numSimsToPlot}{A number specifying how many simulation runs are in the dataset and should be plotted. Default is 10.
+\item{numSimsToPlot}{A number specifying how many simulation runs are in the dataset and should be plotted. Default is 10.}
+
+\item{maxIntensityChanges}{the maximum number of distinguishable intensity changes. DEFAULT = 8.}
+
+\item{maxHueChanges}{the maximum number of distinguishable hue changes. DEFAULT = 10.
 '}
 }
 \value{

@@ -2,6 +2,7 @@
 
 export(RRW)
 export(assessRRWfit)
+export(convertMeanShiftToOverlap)
 export(filterRRWdataMinN)
 export(getDRMpredValue)
 export(getGroupColsFromModelList)

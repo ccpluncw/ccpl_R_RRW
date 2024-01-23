@@ -8,6 +8,7 @@ pCrossBoundaryDist(
   overlap,
   boundary,
   stepSize = 1,
+  boundaryChangeSensitivity = 0.25,
   startValue = 0,
   noiseSD = 0,
   decayAsymptote = 0.2,
@@ -21,6 +22,8 @@ pCrossBoundaryDist(
 \item{boundary}{A number specifying the boundary distance from a 0 startpoint. This value is specific to the RRW simulation and has no default value}
 
 \item{stepSize}{A number that specifies the granularity that the simulation will generate the probability crossing a boundary.  stepSize = 1 is the Default and most granular.}
+
+\item{boundaryChangeSensitivity}{A number that adjusts the likelihood that the boundary will be reduced because there it is taking too many samples before reaching a threshold. Essentially, this models a decision-maker reducing the amount of information that they need before a response because it is taking to long.  The boundary reduces when there is little change in the likelihood of a response after N number of steps.  The routine makes this determination as a function of the size of the unaltered boundary (boundaryChangeSensitivity * boundary). Small values (e.g., 0.1), result in an impatient person (relatively early chnage in the boundary values).  Large values (e.g., 0.9), result in a patient person (a boundary that is relatively resistent to change.  A value of 0 is an exception: it will result in no boundary reduction under any circumstances. Impatience increases the likelihood of an error, so it increases the average time of error responses.  Default is 0.25.}
 
 \item{startValue}{A signed number between -1 and 1 that indicates the position of the start point as a proportion of the boundary value.  startValue = 0 is the default and represents an unbiased start point.}
 

@@ -24,19 +24,22 @@ rrwRawDataToRRWFormatData <- function(data, grpCols = NULL, dataRtCol = "rt", co
 
   #here are the columns we will keep in the end.  We add it here, because later
   #it will be more difficult. The columns in "quotes" are columns we create inside this function
-  keepCols <- c(ddplyGroupColumns, "pHit", "rt", "n")
+  keepCols <- c(ddplyGroupColumns, "pHit", "pHitVar", "pHitN", "rt", "rtVar", "n")
 
   #here we collapse the data for the correct and incorrect and RT data.
   #correct == T
-  df.rwPhit.T<-data.frame(data %>% dplyr::group_by_at(ddplyGroupColumns) %>% dplyr::summarise(pHit = mean(correct01, na.rm=T)))
+  df.rwPhit.T<-data.frame(data %>% dplyr::group_by_at(ddplyGroupColumns) %>% dplyr::summarise(pHit = mean(correct01, na.rm=T), pHitN = length(correct01)))
+	df.rwPhit.T$pHitVar <- chutils::ch.propVar(df.rwPhit.T$pHit, df.rwPhit.T$pHitN)
   #correct == F
-  df.rwPhit.F<-data.frame(data %>% dplyr::group_by_at(ddplyGroupColumns) %>% dplyr::summarise(pHit = 1 - mean(correct01, na.rm=T)))
-  #prepare RT data
+  df.rwPhit.F<-data.frame(data %>% dplyr::group_by_at(ddplyGroupColumns) %>% dplyr::summarise(pHit = 1 - mean(correct01, na.rm=T), pHitN = length(correct01)))
+  df.rwPhit.F$pHitVar <- chutils::ch.propVar(df.rwPhit.F$pHit, df.rwPhit.F$pHitN)
+	
+	#prepare RT data
   if(splitByCorrect) {
     ddplyGroupColumns <- c(ddplyGroupColumns, "correct01")
     keepCols <- c(keepCols, "correct")
   }
-  df.rwRT<-data.frame(data %>% dplyr::group_by_at(ddplyGroupColumns) %>% dplyr::summarise(rt = mean(eval(parse(text = dataRtCol)), na.rm=T), n = length(correct01)))
+  df.rwRT<-data.frame(data %>% dplyr::group_by_at(ddplyGroupColumns) %>% dplyr::summarise(rt = mean(eval(parse(text = dataRtCol)), na.rm=T), rtVar = var(eval(parse(text = dataRtCol)), na.rm=T), n = length(correct01)))
 
   if(splitByCorrect) {
     #we now code the correct and incorrect using TRUE and FALSE
@@ -52,10 +55,8 @@ rrwRawDataToRRWFormatData <- function(data, grpCols = NULL, dataRtCol = "rt", co
 
   #merge pHit and RT data
   df.raw <- merge(df.pHit,df.rwRT, all=T)
-
   #keep only needed columns
   df.raw <- df.raw[, keepCols]
-
   #return the new, collasped RRW data
   return(df.raw)
 }
