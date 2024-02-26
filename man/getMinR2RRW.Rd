@@ -10,7 +10,7 @@ getMinR2RRW(
   simRT,
   dataRT,
   equalizeRTandPhit = FALSE,
-  na.rm = T
+  standardize = T
 )
 }
 \arguments{
@@ -22,7 +22,7 @@ getMinR2RRW(
 
 \item{equalizeRTandPhit}{A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the r square of the pHit and RT is calculated by equalizing the influence of the number of observations. If it is set to FALSE, then the output is calculated as usual. DEFAULT = FALSE.}
 
-\item{na.rm}{a boolean that specifies whether to remove NAs. DEFAULT = T.}
+\item{standardize}{a boolean that specifies whether to standardize the DVs before running. Unstandardized data may give biased results when equalizeRTandPhit = T. DEFAULT = T.}
 }
 \value{
 (1-r2) this is used as the value to be minimized by an optimization program

@@ -16,18 +16,20 @@ getMomentsOfDRM <- function(CDFps, values) {
   if( mean(CDFps[trunc((length(CDFps) - length(CDFps)/10)):length(CDFps)]) > 0.005) {
     tryCatch ({
       tmp.drm <- drc::drm(CDFps ~ values, fct = drc::LL2.3(), robust='mean')
-      }, error = function(e) {
+    }, error = function(e) {
           print(paste("drm function did not fit - trying alternate method ..."))
     })
   }
   if (is.null(tmp.drm)) {
+    CDFps.out <- stats::smooth.spline(values, CDFps)
+    CDFps <- CDFps.out$y
+    CDFps <- ifelse(CDFps < 0, 0, CDFps)
     pdf <- diff(CDFps)/diff(values)
     pdf <- ifelse(pdf < 0, 0, pdf)
     df.out <- NULL
     tryCatch ({
       df.out <- getMomentsOfPDF(pdf, values[2:length(values)])
       }, error = function(e) {
-#          print(paste("getMomentsOfPDF - trying alternate method ..."))
     })
     if(is.null(df.out)) {
       df.out$mean <- NA

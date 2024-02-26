@@ -30,6 +30,7 @@ rrwRunWithFixedParameters <- function(data, rrwModelList, minN = 20, dataOverlap
 
   #get grouping columns from modelList
   grpCols <- getGroupColsFromModelList(rrwModelList)
+
   #collapse data
   df.raw <- rrwRawDataToRRWFormatData(data, grpCols, dataRtCol, correctCol,correctVals, dataOverlapCol)
   #add coded columns

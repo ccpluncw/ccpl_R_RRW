@@ -44,8 +44,12 @@ validateParameters <- function(data, b, bcs, Ter, s, nSD, db, da, vc, bCols, bcs
   daIn <- NULL
   dbIn <- NULL
 
+
   for(i in 1:data.n) {
-    ovIn[i] <- data.tmp[i,dataOverlapCol] + getRowParameterValue(data.tmp[i,], vcCols, vc)
+#    ovIn[i] <- data.tmp[i,dataOverlapCol] + getRowParameterValue(data.tmp[i,], vcCols, vc)
+    vcMS <-  getRowParameterValue(data.tmp[i,], vcCols, vc)
+    ovIn[i] <- convertMeanShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+
     bIn[i] <- getRowParameterValue(data.tmp[i,], bCols, b)
     bcsIn[i] <- getRowParameterValue(data.tmp[i,], bcsCols, bcs)
     TerIn <- getRowParameterValue(data.tmp[i,], TerCols, Ter)

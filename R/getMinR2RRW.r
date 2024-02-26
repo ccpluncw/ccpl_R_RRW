@@ -6,13 +6,24 @@
 #' @param simRT a vector of numbers that is the fitted data generated from the model for the RT.
 #' @param dataPhit a vector of numbers that were fitted by a model to produce simRT.
 #' @param equalizeRTandPhit A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations.  RT has more observations than pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the r square of the pHit and RT is calculated by equalizing the influence of the number of observations. If it is set to FALSE, then the output is calculated as usual. DEFAULT = FALSE.
-#' @param na.rm a boolean that specifies whether to remove NAs. DEFAULT = T.
+#' @param standardize a boolean that specifies whether to standardize the DVs before running. Unstandardized data may give biased results when equalizeRTandPhit = T. DEFAULT = T.
 #' @return (1-r2) this is used as the value to be minimized by an optimization program
 #' @keywords minimize r2 r-square
 #' @export
 #' @examples getMinR2RRW (fittedPhit, pHit, fittedRT, rt)
 
-getMinR2RRW <- function(simPhit, dataPhit, simRT, dataRT, equalizeRTandPhit = FALSE, na.rm=T) {
+getMinR2RRW <- function(simPhit, dataPhit, simRT, dataRT, equalizeRTandPhit = FALSE, standardize=T) {
+
+  #### put both dv's on the same scale
+  if (standardize) {
+    df.rt.z <- standardizeDataAndFit(dataRT, simRT)
+    dataRT <- df.rt.z$data
+    simRT <- df.rt.z$fit
+    df.pHit.z <- standardizeDataAndFit(dataPhit, simPhit)
+    dataPhit <- df.pHit.z$data
+    simPhit <- df.pHit.z$fit
+  }
+  #####
 
   #get rss and tss for pHit and rt
   pHit.tss <- chutils::ch.TSS(dataPhit, standardize = FALSE)
@@ -52,10 +63,10 @@ getMinR2RRW <- function(simPhit, dataPhit, simRT, dataRT, equalizeRTandPhit = FA
     r2 <- 1 - (rss.equal/tss.equal)
 
   } else {
-
-    #simply add the rss and tss of the pHit and RT.
-    r2 <- 1 - ((pHit.rss + rt.rss)/(pHit.tss + rt.tss))
-
+    df.rt.z <- standardizeDataAndFit(dataRT, simRT)
+    df.pHit.z <- standardizeDataAndFit(dataPhit, simPhit)
+    df.z <- rbind(df.rt.z, df.pHit.z)
+    r2 <- ch.R2(df.z$data, df.z$fit)
   }
   #return 1-r2 for the minimization.
   out.r2 <- 1-r2

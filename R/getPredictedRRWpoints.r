@@ -46,14 +46,14 @@ getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, merg
     for(i in 1:data.n) {
 
       #get the parameter values summed over the columns
-      ovIn <- data.tmp[i,dataOverlapCol] + getRowParameterValue(data.tmp[i,], vcCols, valueChange)
+#      ovIn <- data.tmp[i,dataOverlapCol] + getRowParameterValue(data.tmp[i,], vcCols, valueChange)
 
       ######################## START ############################
       ##### When I turn on the new overlap shift calculations, simply uncomment the next two lines, and comment the previous line.
       ##### This code gets mean shift which is a free parameter
-      #vcMS <- getRowParameterValue(data.tmp[i,], vcCols, valueChange)
+      vcMS <- getRowParameterValue(data.tmp[i,], vcCols, valueChange)
       ##### This code converts the mean shift into an overlap
-      #ovIn <- convertMeanShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+      ovIn <- convertMeanShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
       ######################## DONE ############################
 
       bIn <- getRowParameterValue(data.tmp[i,], bCols, b)

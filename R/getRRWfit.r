@@ -116,7 +116,8 @@ getRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2, vc
       cat(" Below are the R squares for the Model's fit to p(HVO) and RT separately.\n\n")
 
       cat(" p(HVO) R Square = ", 1 - pCor.rss, "\n")
-      cat(" RT R Square = ", 1 - Q50.rss, "\n\n")
+      cat(" RT R Square = ", 1 - Q50.rss, "\n")
+      cat(" Average R Square = ", 1 - ave.rss, "\n\n")
 
       cat(" Below is the Simulation Epoch Transformation. It scales the number of random walk samples to RT.\n")
       cat(" RTb = ", coef(Q50.lm)[2], "\n\n")

@@ -15,7 +15,7 @@
 #' @export
 #' @examples pCrossBoundaryDist (overlap=0.1, boundary=14, startValue=0.1, loops = 400)
 
-pCrossBoundaryDist <- function (overlap, boundary, stepSize = 1, boundaryChangeSensitivity = 0.25, startValue = 0, noiseSD = 0, decayAsymptote = 0.2, decayBeta = 0.0, loops = 200) {
+pCrossBoundaryDist1 <- function (overlap, boundary, stepSize = 1, boundaryChangeSensitivity = 0.25, startValue = 0, noiseSD = 0, decayAsymptote = 0.2, decayBeta = 0.0, loops = 200) {
 
   df.dist <- NULL
   i <- 1
@@ -37,13 +37,12 @@ pCrossBoundaryDist <- function (overlap, boundary, stepSize = 1, boundaryChangeS
       done <- ifelse( mPcrossBothDoneCheck >= 0.999, TRUE, FALSE)
     }
 
-      #Has the number of samples exceeded boundaryChangeThreshold?
- 	   if(boundaryChangeThreshold > 0 & i > boundaryChangeThreshold & mPcrossBothDoneCheck > 0) {
-      #if there has been little change in the last 10% of trials
+ 	   if(boundaryChangeThreshold > 0 & i > (boundaryChangeThreshold * 2) & mPcrossBothDoneCheck > 0) {
+      #if there has been little change in the last "boundaryChangeThreshold" of trials
 			mPcrossBothLastSet <- mPcrossBoth
 
-			mPcrossAlastNtrials <- mean(df.dist$pCrossA[(length(df.dist$pCrossA) - length(df.dist$pCrossA)/10):length(df.dist$pCrossA)])
-			mPcrossBlastNtrials <- mean(df.dist$pCrossB[(length(df.dist$pCrossB) - length(df.dist$pCrossB)/10):length(df.dist$pCrossB)])
+			mPcrossAlastNtrials <- mean(df.dist$pCrossA[(length(df.dist$pCrossA) - boundaryChangeThreshold):length(df.dist$pCrossA)])
+			mPcrossBlastNtrials <- mean(df.dist$pCrossB[(length(df.dist$pCrossB) - boundaryChangeThreshold):length(df.dist$pCrossB)])
 			mPcrossBoth <- mPcrossAlastNtrials + mPcrossBlastNtrials
 
       if ( mPcrossBoth <= mPcrossBothLastSet) {

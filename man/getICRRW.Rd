@@ -11,7 +11,8 @@ getICRRW(
   dataRT,
   numParameters,
   equalizeRTandPhit = FALSE,
-  ICtype = "BIC"
+  ICtype = "BIC",
+  standardize = T
 )
 }
 \arguments{
@@ -25,7 +26,9 @@ getICRRW(
 
 \item{equalizeRTandPhit}{A boolean that specifies whether the influence of the pHit should be equal to that of rt.  Influence is a function of the number of observations in the BIC.  RT has more observations that pHit because it has both correct RTs and incorrect RTs.  If this is set to TRUE, then the rss is standardized by the number of observations. If it is set to FALSE, then the BIC is calculated as usual. DEFAULT = FALSE.}
 
-\item{ICtype}{A string specifying whether to return the AIC or BIC.  Valid inputs are: "AIC" and "BIC".  DEFAULT = "BIC"
+\item{ICtype}{A string specifying whether to return the AIC or BIC.  Valid inputs are: "AIC" and "BIC".  DEFAULT = "BIC"}
+
+\item{standardize}{a boolean that specifies whether to standardize the DVs before running. Unstandardized data may give biased results when equalizeRTandPhit = T. DEFAULT = T.
 '}
 }
 \value{
