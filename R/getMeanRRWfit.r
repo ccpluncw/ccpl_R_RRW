@@ -10,6 +10,7 @@
 #' @param db A vector of signed number(s) representing the beta value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of db. The column names must be specified in the "dbCols" argument. db = 0 is the default and represents no IAB.
 #' @param da A vector of positive number(s) representing the asymptote value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of da. The column names must be specified in the "daCols" argument. da = 0.2 is the default.
 #' @param vc A vector of signed number(s) that indicates the change of overlap that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of vc. The column names must be specified in the "vcCols" argument. The default is 0 because there is no valueChangeEffect.
+#' @param ec A vector of signed number(s) that indicates the change of the evaluation criterion (the position of the criterion in SDT) that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of ec. The column names must be specified in the "ecCols" argument. The default is 0 because this is an unbiased evaluation criterion.
 #' @param bCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of boundary (b).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of b.
 #' @param bcsCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the boundaryChangeSensitivity (bcs).  These columns must be effect coded, because the values contained in this column will be multiplied by the value of bcs. All effect/dummy codes must be >=0.
 #' @param TerCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the non-decision time (Ter).  These columns should be effect/dummy coded, because the values contained in this column will be multiplied by the value of Ter.  All effect/dummy codes must be >=0.
@@ -18,6 +19,7 @@
 #' @param dbCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decayBeta (db).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of db.
 #' @param daCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decay asymptote (da).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of da.
 #' @param vcCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (vc).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
+#' @param ecCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of the evaluation criterion (ec).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
 #' @param dataOverlapCol A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"
 #' @param RwSamplesCol A string that identifies the name of the column in the RRW simulations that contains the summary of the samples that you want to use as a simulation for RT.  The possible columns are: "Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile).  The default is "Q50" because the median is more robust than the mean.
 #' @param dataRtCol A string that identifies the name of the column in data that contains the RTs for the specific overlap/correct/condition combination. Default is "rt"
@@ -34,7 +36,7 @@
 #' @export
 #' @examples getRRWfit (data, b=14, s=0.1, loopsPerRWstep = 2000, sinkFilename = "outStats.txt")
 
-getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2, vc = 0, bCols = NULL, bcsCols = NULL, TerCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, numSimsToAverage = 10, sinkFilename = NULL, pars.n = NULL, equalizeRTandPhit = FALSE) {
+getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2, vc = 0, ec = 0, bCols = NULL, bcsCols = NULL, TerCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, ecCols = NULL, dataOverlapCol = "overlap", RwSamplesCol = "Q50", dataRtCol = "rt", dataPhitCol = "pHit", dataCorrectCol = "correct", loopsPerRWstep = 2000, numSimsToAverage = 10, sinkFilename = NULL, pars.n = NULL, equalizeRTandPhit = FALSE) {
 
   #the RW columns are defined by the program. The column used to compare with the data RT is a choice of the user.
   RWkeepColumns <- c("overlap", RwSamplesCol, "pCross", "correct")
@@ -42,12 +44,12 @@ getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2
   mergeByRWColumns <- c("overlap", "correct")
 
   #add the parameter effect columns. if they are NULL, they don't appear anyways
-  RWkeepColumns <- c(RWkeepColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols)
-  mergeByDataColumns <- c(mergeByDataColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols)
-  mergeByRWColumns <- c(mergeByRWColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols)
+  RWkeepColumns <- c(RWkeepColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols, ecCols)
+  mergeByDataColumns <- c(mergeByDataColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols, ecCols)
+  mergeByRWColumns <- c(mergeByRWColumns, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols, ecCols)
 
   if(is.null(pars.n)) {
-    pars.n = 1 + length(b) + ifelse(length(bcs)==1 & bcs[1]==0.25, 0, length(bcs)) + ifelse(length(Ter)==1 & Ter[1]==0, 0, length(Ter)) + ifelse(length(s)==1 & s[1]==0, 0, length(s)) + ifelse(length(nSD)==1 & nSD[1]==0, 0, length(nSD)) + ifelse(length(db)[1]==1 & db==0, 0, length(db)) + ifelse(length(da)[1]==1 & da==0.2, 0, length(da)) + ifelse(length(vc)==1 & vc[1]==0, 0, length(vc))
+    pars.n = 1 + length(b) + ifelse(length(bcs)==1 & bcs[1]==0.25, 0, length(bcs)) + ifelse(length(Ter)==1 & Ter[1]==0, 0, length(Ter)) + ifelse(length(ec)==1 & ec[1]==0, 0, length(ec)) + ifelse(length(s)==1 & s[1]==0, 0, length(s)) + ifelse(length(nSD)==1 & nSD[1]==0, 0, length(nSD)) + ifelse(length(db)[1]==1 & db==0, 0, length(db)) + ifelse(length(da)[1]==1 & da==0.2, 0, length(da)) + ifelse(length(vc)==1 & vc[1]==0, 0, length(vc))
   }
 
   df.fitted <- NULL
@@ -64,7 +66,7 @@ getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2
 
     cat(i," of ", numSimsToAverage, "\n")
 
-    df.tmp <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, boundaryChangeSensitivity = bcs, Ter = Ter, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, bCols = bCols, bcsCols = bcsCols, TerCols = TerCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, loops = loopsPerRWstep)
+    df.tmp <- getPredictedRRWpoints(data = data, RWkeepColumns = RWkeepColumns, mergeByDataColumns = mergeByDataColumns, mergeByRWColumns = mergeByRWColumns, dataRtCol = dataRtCol, RwSamplesCol = RwSamplesCol, dataOverlapCol = dataOverlapCol, b = b, boundaryChangeSensitivity = bcs, Ter = Ter, startValue = s,  noiseSD = nSD, decayBeta = db, decayAsymptote = da, valueChange = vc, evaluationCriterion = ec, bCols = bCols, bcsCols = bcsCols, TerCols = TerCols, sCols = sCols, nSDCols = nSDCols, dbCols = dbCols, daCols = daCols, vcCols = vcCols, ecCols = ecCols, loops = loopsPerRWstep)
 
     #get (1-r2) for the pHit and RT.
      pCor.rss[i] <- getMinR2(df.tmp[df.tmp$correct == TRUE, "pCross"], df.tmp[df.tmp$correct == TRUE, dataPhitCol])
@@ -165,6 +167,9 @@ getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2
       if(!is.null(vcCols)) cat(" ValueChange Effect Codes = ", vcCols, "\n")
       cat(" ValueChange = ", vc, "\n\n")
 
+      if(!is.null(ecCols)) cat(" EvaluationCriterion Effect Codes = ", ecCols, "\n")
+      cat(" EvaluationCriterion = ", ec, "\n\n")
+
       cat("\n\n ******** Final Model Fit Statistics ******** \n\n")
       cat(" The Final Model is the average prediction across N simulation with parameters fixed to the above values. \n")
       cat(" Number of Simulations = ", numSimsToAverage, "\n\n")
@@ -235,9 +240,14 @@ getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2
   } else {
     ValueChange <- list(columns = "vc", values = vc)
   }
+  if(!is.null(ecCols)) {
+    EvaluationCriterion <- list(columns = ecCols, values = ec)
+  } else {
+    EvaluationCriterion <- list(columns = "ec", values = ec)
+  }
 
   runInfo <- list(numSimRuns = numSimsToAverage, equalizePhitRT = equalizeRTandPhit)
-  parameters <- list(Ter = Ter, b = boundary, bcs = boundaryChangeSensitivity, s = StartValue, nSD = NoiseSD, db = DecayBeta, da = DecayAsymptote, vc = ValueChange)
+  parameters <- list(Ter = Ter, b = boundary, bcs = boundaryChangeSensitivity, s = StartValue, nSD = NoiseSD, db = DecayBeta, da = DecayAsymptote, vc = ValueChange, ec = EvaluationCriterion)
   runStats <- list(parameters = parameters, fitStats = fitStats, runInfo = runInfo)
 
   outlist <- list(df.fitted = df.fitted, runStats = runStats)

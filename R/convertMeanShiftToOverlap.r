@@ -11,10 +11,9 @@
 
 convertMeanShiftToOverlap <- function (currentOverlap, meanShiftInSDunits, allowExactZeroToShift = T) {
 	## Identify the number of iterations the correction must have
-	loops <- meanShiftInSDunits/0.05
-	## The correction factor because loops has a .05 interval
-	dec <- loops%%1
-	#number of iterations need to be positive
+	loops <- meanShiftInSDunits/0.02
+
+	#number of iterations need to be positive - 0.02 SD shift is the max accuracy
 	units <- abs(trunc(loops))
 
 	## starting values
@@ -25,7 +24,8 @@ convertMeanShiftToOverlap <- function (currentOverlap, meanShiftInSDunits, allow
 	#  This is aprt of the overOneCorrection routine
 	meanShiftSign <- sign(meanShiftInSDunits)
 	#successively calculate the change in overlap as a function of mean shift in SD units
-	for(i in 1:units) {
+	while((units) > 0) {
+		newOverlapNminus1 <- newOverlap
 		#set this iteration of localMeanShiftSign back to the original meanShiftSign
 		localMeanShiftSign <- meanShiftSign
 
@@ -57,9 +57,11 @@ convertMeanShiftToOverlap <- function (currentOverlap, meanShiftInSDunits, allow
 				#first allow newOverlap to change if it == 0
 				if(allowExactZeroToShift & newOverlap == 0) newOverlap <- 0.0001
 				#this is a formula I calculated from shifting two normal distributions relative to one another
-				diffOverlap <- (-0.031 * newOverlap^0.61)
-				#if mean shift is negative, subtract from newOverlap, otherwise add
-				newOverlap <- newOverlap+(localMeanShiftSign*diffOverlap)
+				if(localMeanShiftSign < 0) {
+					newOverlap <- (1.012 * newOverlap^0.993)
+				} else {
+					newOverlap <- (0.9884 * newOverlap^1.0091)
+				}
 				if(overOneCorrection) {
 					#if there was an over one corection, convert the result back to the original scale
 					newOverlap <- (1 - newOverlap) + 1
@@ -67,9 +69,7 @@ convertMeanShiftToOverlap <- function (currentOverlap, meanShiftInSDunits, allow
 			} else {
 				newOverlap <- 0
 			}
+			units <- units - 1
 	}
-	####### impute decimal version of the change from last difference estimate
-	lastDiff <- diffOverlap*dec
-	newOverlap <- newOverlap+lastDiff
 	return(newOverlap)
 }

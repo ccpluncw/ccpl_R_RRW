@@ -16,6 +16,7 @@
 #' @param decayBeta A vector of signed number(s) representing the beta value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayBeta. The column names must be specified in the "dbCols" argument. decayBeta = 0 is the default and represents no IAB.
 #' @param decayAsymptote A vector of positive number(s) representing the asymptote value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayAsymptote. The column names must be specified in the "daCols" argument. decayAsymptote = 0.2 is the default.
 #' @param valueChange A vector of signed number(s) that indicates the change of overlap that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of valueChange. The column names must be specified in the "vcCols" argument. The default is 0 because there is no valueChangeEffect.
+#' @param evaluationCriterion A vector of signed number(s) that indicates the change of the evaluation criterion (the position of the criterion in SDT) that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of ec. The column names must be specified in the "ecCols" argument. The default is 0 because this is an unbiased evaluation criterion.
 #' @param bCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of boundary (b).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of b.
 #' @param bcsCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the boundaryChangeSensitivity (bcs).  These columns must be effect coded, because the values contained in this column will be multiplied by the value of bcs. All effect/dummy codes must be >=0.
 #' @param TerCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the non-decision time (Ter).  These columns should be effect/dummy coded, because the values contained in this column will be multiplied by the value of Ter.  All effect/dummy codes must be >=0.
@@ -24,17 +25,18 @@
 #' @param dbCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decayBeta (decayBeta).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayBeta.
 #' @param daCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decay asymptote (decayAsymptote).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayAsymptote.
 #' @param vcCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (valueChange).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
+#' @param ecCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of the evaluation criterion (ec).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
 #' @param loops A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.
 #' @return A dataframe that contains the "data" plus the fitted values from the model ("Q25" (the 25th quartile); "Q50" (the median); "mean" (the mean); "Q75" (the 75th quartile); pCross (the fitted pHit from the model - probability of crossing each boundary); rtFit (the fitted rt values from the model))
 #' @keywords RRW random walk simulation get predicted
 #' @export
 #' @examples getPredictedRRWpoints (data, RWkeepColumns = c("overlap", "Q50", "pCross", "correct"), mergeByDataColumns = c("overlap", "correct"), dataRtCol = "rt", RwSamplesCol = "Q50", dataOverlapCol= "overlap", b=14, s=0.1, loops = 400)
 
-getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, mergeByRWColumns, dataRtCol, RwSamplesCol, dataOverlapCol, b, boundaryChangeSensitivity = 0.25, Ter = 0, startValue = 0,  noiseSD = 0, decayBeta = 0.0, decayAsymptote = 0.2, valueChange = 0, bCols = NULL, bcsCols = NULL, TerCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL,loops = 200) {
+getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, mergeByRWColumns, dataRtCol, RwSamplesCol, dataOverlapCol, b, boundaryChangeSensitivity = 0.25, Ter = 0, startValue = 0,  noiseSD = 0, decayBeta = 0.0, decayAsymptote = 0.2, valueChange = 0, evaluationCriterion = 0, bCols = NULL, bcsCols = NULL, TerCols = NULL, sCols = NULL, nSDCols = NULL, dbCols = NULL, daCols = NULL, vcCols = NULL, ecCols = NULL, loops = 200) {
 
     #get the unique rows to run the simulation on.  First, you need the overlap column
-    dataRunCols <- c(dataOverlapCol, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols)
-    effectCols <- c(bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols)
+    dataRunCols <- c(dataOverlapCol, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols, ecCols)
+    effectCols <- c(bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols, ecCols)
 
     #extract the unique information
     data.tmp <- unique(data[,dataRunCols, drop=F])
@@ -53,7 +55,15 @@ getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, merg
       ##### This code gets mean shift which is a free parameter
       vcMS <- getRowParameterValue(data.tmp[i,], vcCols, valueChange)
       ##### This code converts the mean shift into an overlap
-      ovIn <- convertMeanShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+        #this is an old version - never implemented
+        #ovIn <- convertValueShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+      ovIn <- convertDistributionShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+      ##### This code converts the evaluation criterion shift into an overlap. The input is ovIn,
+      ##### just in case there is both a value change effect and an evaluation criterion change
+      ecMS <- getRowParameterValue(data.tmp[i,], ecCols, evaluationCriterion)
+        #this is an old version - never implemented
+        #ovIn <- convertCriterionShiftToOverlap(ovIn, ecMS)
+      ovIn <- convertDistributionShiftToOverlap(ovIn, ecMS)
       ######################## DONE ############################
 
       bIn <- getRowParameterValue(data.tmp[i,], bCols, b)

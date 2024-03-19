@@ -20,6 +20,7 @@ getPredictedRRWpoints(
   decayBeta = 0,
   decayAsymptote = 0.2,
   valueChange = 0,
+  evaluationCriterion = 0,
   bCols = NULL,
   bcsCols = NULL,
   TerCols = NULL,
@@ -28,6 +29,7 @@ getPredictedRRWpoints(
   dbCols = NULL,
   daCols = NULL,
   vcCols = NULL,
+  ecCols = NULL,
   loops = 200
 )
 }
@@ -60,6 +62,8 @@ getPredictedRRWpoints(
 
 \item{valueChange}{A vector of signed number(s) that indicates the change of overlap that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of valueChange. The column names must be specified in the "vcCols" argument. The default is 0 because there is no valueChangeEffect.}
 
+\item{evaluationCriterion}{A vector of signed number(s) that indicates the change of the evaluation criterion (the position of the criterion in SDT) that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of ec. The column names must be specified in the "ecCols" argument. The default is 0 because this is an unbiased evaluation criterion.}
+
 \item{bCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of boundary (b).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of b.}
 
 \item{bcsCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the boundaryChangeSensitivity (bcs).  These columns must be effect coded, because the values contained in this column will be multiplied by the value of bcs. All effect/dummy codes must be >=0.}
@@ -75,6 +79,8 @@ getPredictedRRWpoints(
 \item{daCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decay asymptote (decayAsymptote).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of decayAsymptote.}
 
 \item{vcCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (valueChange).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.}
+
+\item{ecCols}{A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of the evaluation criterion (ec).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.}
 
 \item{loops}{A number specifying the number of loops that will be run in the RRW simulation when it calculates the summary statistics for each number of samples for each boundary. Higher numbers produce more precise estimates, but also increase the time needed to converge on a solution.  Default is 200.}
 

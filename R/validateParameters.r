@@ -10,6 +10,7 @@
 #' @param db A vector of signed number(s) representing the beta value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of db. The column names must be specified in the "dbCols" argument.
 #' @param da A vector of positive number(s) representing the asymptote value in the Information Accrual Bias (IAB).  If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of da. The column names must be specified in the "daCols" argument.
 #' @param vc A vector of signed number(s) that indicates the change of overlap that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of vc. The column names must be specified in the "vcCols" argument.
+#' @param ec A vector of signed number(s) that indicates the change of the evaluation criterion (the position of the criterion in SDT) that one predicts. If the number of values is greater than 1, then each value must have a corresponding effect coded column in the dataset. These columns should be effect coded, because the values contained in this column will be multiplied by the value of ec. The column names must be specified in the "ecCols" argument.
 #' @param bCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of boundary (b).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of b.
 #' @param bcsCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the boundaryChangeSensitivity (bcs).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of bcs. All effect/dummy codes must be positive.
 #' @param TerCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the non-decision time (Ter).  These columns should be effect/dummy coded, because the values contained in this column will be multiplied by the value of Ter.  All effect/dummy codes must be positive.
@@ -18,17 +19,18 @@
 #' @param dbCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decayBeta (db).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of db.
 #' @param daCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of decay asymptote (da).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of da.
 #' @param vcCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of value change (vc).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
+#' @param ecCols A vector of strings that identifies the name(s) of the column in data that identifies the conditions that will affect the change of the evaluation criterion (ec).  These columns should be effect coded, because the values contained in this column will be multiplied by the value of overlap.
 #' @param dataOverlapCol A string that identifies the name of the column in data that contains the distributional overlaps for each row. The default is "overlap"
 #' @return TRUE if the parameters are valid; FALSE if the parameters are invalid
 #' @keywords RRW random walk parameters validate
 #' @export
 #' @examples validateParameters (data, b=14, s=0.1, nSD = 0, db = .2, da = .2, vc = 0, sCols=NULL, nSDCols=NULL, dbCols=NULL, daCols=NULL, vcCols="valueChangeEffect")
 
-validateParameters <- function(data, b, bcs, Ter, s, nSD, db, da, vc, bCols, bcsCols, TerCols, sCols, nSDCols, dbCols, daCols, vcCols, dataOverlapCol) {
+validateParameters <- function(data, b, bcs, Ter, s, nSD, db, da, vc, ec, bCols, bcsCols, TerCols, sCols, nSDCols, dbCols, daCols, vcCols, ecCols, dataOverlapCol) {
 
   out <- TRUE
 
-  dataRunCols <- c(dataOverlapCol, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols)
+  dataRunCols <- c(dataOverlapCol, bCols, sCols, nSDCols, dbCols, daCols, vcCols, bcsCols, TerCols, ecCols)
 
   #extract the unique information
   data.tmp <- unique(data[,dataRunCols, drop=F])
@@ -37,7 +39,7 @@ validateParameters <- function(data, b, bcs, Ter, s, nSD, db, da, vc, bCols, bcs
   ovIn <- NULL
   bIn <- NULL
   bcsIn <- NULL
-  bcsIn <- NULL
+  ecIn <- NULL
   TerIn <- NULL
   sIn <- NULL
   nSDIn <- NULL
@@ -48,7 +50,8 @@ validateParameters <- function(data, b, bcs, Ter, s, nSD, db, da, vc, bCols, bcs
   for(i in 1:data.n) {
 #    ovIn[i] <- data.tmp[i,dataOverlapCol] + getRowParameterValue(data.tmp[i,], vcCols, vc)
     vcMS <-  getRowParameterValue(data.tmp[i,], vcCols, vc)
-    ovIn[i] <- convertMeanShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+    ovIn[i] <- convertValueShiftToOverlap(data.tmp[i,dataOverlapCol], vcMS)
+    ecIn[i] <- getRowParameterValue(data.tmp[i,], ecCols, ec)
 
     bIn[i] <- getRowParameterValue(data.tmp[i,], bCols, b)
     bcsIn[i] <- getRowParameterValue(data.tmp[i,], bcsCols, bcs)
