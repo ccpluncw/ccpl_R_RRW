@@ -90,6 +90,9 @@ getPredictedRRWpoints <- function (data, RWkeepColumns, mergeByDataColumns, merg
 
     df.out2 <- merge(df.out1, data, by.x = mergeByRWColumns, by.y=mergeByDataColumns)
 
+    ## remove predictions for values that are not present in the dataset (NAs)
+		df.out2[[RwSamplesCol]] <- ifelse(is.na(df.out2[[dataRtCol]]), NA, df.out2[[RwSamplesCol]])
+
     #scale the RRW samples to fit the empirical RT data
     fit.lm <- NULL
     tryCatch ({
