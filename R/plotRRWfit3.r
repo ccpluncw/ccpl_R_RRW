@@ -17,12 +17,13 @@
 #' @param combineRThvoRTlvo A boolean that specifies whether to print the RT_HVO and RT_LVO on the same graph (TRUE) or separate graphs (FALSE).  DEFAULT = FALSE.
 #' @param maxIntensityChanges the maximum number of distinguishable intensity changes. DEFAULT = 8.
 #' @param maxHueChanges the maximum number of distinguishable hue changes. DEFAULT = 10.
+#' @param df.legend a legend dataframe created by ch.getPlotLegendVals().
 #' @return .
 #' @keywords RRW random walk plot output fit
 #' @export
 #' @examples plotRRWFit2 (data, "rt", "pHit", "rtFit", "pHitFit", "correct", "overlap")
 
-plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap", condCol = NULL, numSimsToPlot = 0, plotFilename = NULL, multiplePlotsPerPage = TRUE, yMinMixRT = NULL, xMinMax = NULL, combineRThvoRTlvo = FALSE, maxIntensityChanges = 8, maxHueChanges = 10) {
+plotRRWFit3 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol = "rtFit", pHitFitCol = "pCross", correctCol = "correct", overlapCol = "overlap", condCol = NULL, numSimsToPlot = 0, plotFilename = NULL, multiplePlotsPerPage = TRUE, yMinMixRT = NULL, xMinMax = NULL, combineRThvoRTlvo = FALSE, maxIntensityChanges = 8, maxHueChanges = 10, df.legend = NULL) {
 
 
   #set up plot parameters
@@ -53,18 +54,13 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
     }
 
 
-  #get conditions and number of conditions
-    if(!is.null(condCol)) {
-      conds <- unique(data[[condCol]])
-      conds.n <- length(conds)
-      #create plot info and legend info
-      df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))
-      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
-    } else {
-      conds.n <- 1
-      df.grpIdx <- data.frame(cond = "all", indexNum = c(1))
-      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+    #get conditions and number of conditions
+    if(is.null(df.legend)) {
+      df.legend <- ch.getPlotLegendValsFromData(data, condCol, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
     }
+    conds.n <- nrow(df.legend)
+    conds <- df.legend[, condCol]
+    condCols.n <- length(condCol)
 
     #create empty plot for p(HVO)
     plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
@@ -72,41 +68,57 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
     abline(a=0.5,b=0,col="grey", lwd=2)
 
     if(numSimsToPlot > 0) {
+      #for each row of the dataset
       for(cnd in 1:conds.n) {
         if(!is.null(condCol)) {
-          df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]
+          df.tmp <- data
+          #if there is more than one condition column
+          if(condCols.n > 1) {
+            for(cndCol in condCol) {
+              df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]
+            }
+          } else {
+            #if there is only one condition column
+            df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]
+          }
         } else {
           df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]
         }
-
-        plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
-        lty <- df.legend[cnd,"lty"]
 
         #add background Simulation lines
-          for(i in 1: numSimsToPlot) {
-            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)
-          }
+        for(i in 1: numSimsToPlot) {
+          lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)
         }
       }
+    }
 
       for(cnd in 1:conds.n) {
         if(!is.null(condCol)) {
-          df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]
+          df.tmp <- data
+          if(condCols.n > 1) {
+            for(cndCol in condCol) {
+              df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]
+            }
+          } else {
+            df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]
+          }
         } else {
           df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]
         }
 
         plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
         lty <- df.legend[cnd,"lty"]
+        pch <- df.legend[cnd,"pch"]
+
 
         #add data points and final fit
-        points(df.tmp[[overlapCol]], df.tmp[[dataPhitCol]], col=plotCol, pch=pchTmp, bg = plotCol, cex=pointCEXsize)
+        points(df.tmp[[overlapCol]], df.tmp[[dataPhitCol]], col=plotCol, pch=pch, bg = plotCol, cex=pointCEXsize)
         lines(df.tmp[[overlapCol]], df.tmp[[pHitFitCol]], col=plotCol, lty=lty, lwd = lwd)
       }
 
     #create an empty plot for the legend
     plot.new()
-    chutils::ch.addLegend(df.legend, "cond", placement="center", cexLegend = 0.75, includeTitle = F, lwd = 3)
+    chutils::ch.addLegend(df.legend, condCol, placement="center", cexLegend = 0.75, includeTitle = F, lwd = 3)
 
     #create empty plot for RT_HVO
     plot(NA, ylim=yMinMixRT, xlim = xLims, xlab = NULL, ylab=NA)
@@ -114,13 +126,17 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
       if(numSimsToPlot > 0) {
         for(cnd in 1:conds.n) {
           if(!is.null(condCol)) {
-            df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == TRUE & !is.na(data[[dataRtCol]]), ]
+            df.tmp <- data
+            if(condCols.n > 1) {
+              for(cndCol in condCol) {
+                df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataRtCol]]), ]
+              }
+            } else {
+              df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataRtCol]]), ]
+            }
           } else {
             df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataRtCol]]), ]
           }
-
-          plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
-          lty <- df.legend[cnd,"lty"]
 
           #add background Simulation lines
           for(i in 1: numSimsToPlot) {
@@ -135,13 +151,17 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
         if(numSimsToPlot > 0) {
           for(cnd in 1:conds.n) {
             if(!is.null(condCol)) {
-              df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
+              df.tmp <- data
+              if(condCols.n > 1) {
+                for(cndCol in condCol) {
+                  df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == FALSE & !is.na(df.tmp[[dataRtCol]]), ]
+                }
+              } else {
+                df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == FALSE & !is.na(df.tmp[[dataRtCol]]), ]
+              }
             } else {
               df.tmp <- data[ data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
             }
-
-            plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
-            lty <- df.legend[cnd,"lty"]
 
             #add background Simulation lines
             for(i in 1: numSimsToPlot) {
@@ -154,16 +174,24 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
 
       for(cnd in 1:conds.n) {
         if(!is.null(condCol)) {
-          df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == TRUE & !is.na(data[[dataRtCol]]), ]
+          df.tmp <- data
+          if(condCols.n > 1) {
+            for(cndCol in condCol) {
+              df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataRtCol]]), ]
+            }
+          } else {
+            df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataRtCol]]), ]
+          }
         } else {
           df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataRtCol]]), ]
         }
 
         plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
         lty <- df.legend[cnd,"lty"]
+        pch <- df.legend[cnd,"pch"]
 
         #add data points and final fit
-        points(df.tmp[[overlapCol]], df.tmp[[dataRtCol]], col=plotCol, pch=pchTmp, bg = plotCol, cex=pointCEXsize)
+        points(df.tmp[[overlapCol]], df.tmp[[dataRtCol]], col=plotCol, pch=pch, bg = plotCol, cex=pointCEXsize)
         lines(df.tmp[[overlapCol]], df.tmp[[rtFitCol]], col=plotCol, lty=lty, lwd = lwd)
       }
 
@@ -175,13 +203,17 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
       if(numSimsToPlot > 0) {
         for(cnd in 1:conds.n) {
           if(!is.null(condCol)) {
-            df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
+            df.tmp <- data
+            if(condCols.n > 1) {
+              for(cndCol in condCol) {
+                df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == FALSE & !is.na(df.tmp[[dataRtCol]]), ]
+              }
+            } else {
+              df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == FALSE & !is.na(df.tmp[[dataRtCol]]), ]
+            }
           } else {
             df.tmp <- data[ data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
           }
-
-          plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
-          lty <- df.legend[cnd,"lty"]
 
           #add background Simulation lines
           for(i in 1: numSimsToPlot) {
@@ -192,22 +224,30 @@ plotRRWFit2 <- function (data, dataRtCol = "rt", dataPhitCol = "pHit",  rtFitCol
       }
     } else {
       #if you are combining the HVO and LVO, then change the LVO symbol to an X
-      pchTmp <- 4
+      pch <- 4
       pointCEXsize <- 0.5
     }
 
       for(cnd in 1:conds.n) {
         if(!is.null(condCol)) {
-          df.tmp <- data[ data[[condCol]]==conds[cnd] & data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
+          df.tmp <- data
+          if(condCols.n > 1) {
+            for(cndCol in condCol) {
+              df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == FALSE & !is.na(df.tmp[[dataRtCol]]), ]
+            }
+          } else {
+            df.tmp <- df.tmp[df.tmp[[condCol]] == conds[cnd] & df.tmp[[correctCol]] == FALSE & !is.na(df.tmp[[dataRtCol]]), ]
+          }
         } else {
           df.tmp <- data[ data[[correctCol]] == FALSE & !is.na(data[[dataRtCol]]), ]
         }
 
         plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])
         lty <- df.legend[cnd,"lty"]
+        pch <- df.legend[cnd,"pch"]
 
         #add data points and final fit
-        points(df.tmp[[overlapCol]], df.tmp[[dataRtCol]], col=plotCol, pch=pchTmp, bg = plotCol, cex=pointCEXsize)
+        points(df.tmp[[overlapCol]], df.tmp[[dataRtCol]], col=plotCol, pch=pch, bg = plotCol, cex=pointCEXsize)
         lines(df.tmp[[overlapCol]], df.tmp[[rtFitCol]], col=plotCol, lty=lty, lwd = lwd)
       }
 

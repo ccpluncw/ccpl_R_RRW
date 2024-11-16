@@ -1,182 +1,790 @@
-library(chutils)
-ch.updateRpackage (packageName = "chMorals")
-source("chyTest1.r")
-regFits$RTdat
-regFits$pHVOdat
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)
-regFits$pHVOdat
-regFits$RTdat
-regFits$pHVOdat
-regFits$pHVOFit
-fitted(regFits$pHVOFit)
-predict(regFits$pHVOFit)
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)
-predict(regFits$RTfit)
-data <- df.out4 #
-RTCol <- "keybRT"
-overlapRoundCol = "overlapRound"; correctCol = "correct"; correctVals = c(1,0);  minNperOverlap = params$minOverlapN
-data$correct01 <- ifelse (data[[correctCol]]==correctVals[1], 1, 0)#
-#
-		df.tmp.pHVO <- as.data.frame(data %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(pHit = mean(correct01, na.rm=T), n =sum(!is.na(correct01)) ) )#
-#
-		df.tmp.pHVO <- df.tmp.pHVO[df.tmp.pHVO$n > minNperOverlap,]#
-#
-		df.tmp.RT.correct <- as.data.frame(data[data$correct01 == 1, ] %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(aveRT = mean(eval(parse(text = RTCol)), na.rm=T), medianRT = median(eval(parse(text = RTCol)), na.rm=T), n =sum(!is.na(correct01)) ) )#
-#
-		df.tmp.RT.correct <- df.tmp.RT.correct[df.tmp.RT.correct$n > minNperOverlap,]#
-#
-		pHVOFit <- chutils::ch.pHVOfit(df.tmp.pHVO[[overlapRoundCol]], df.tmp.pHVO$pHit)
-library(dplyr)
-data$correct01 <- ifelse (data[[correctCol]]==correctVals[1], 1, 0)#
-#
-		df.tmp.pHVO <- as.data.frame(data %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(pHit = mean(correct01, na.rm=T), n =sum(!is.na(correct01)) ) )#
-#
-		df.tmp.pHVO <- df.tmp.pHVO[df.tmp.pHVO$n > minNperOverlap,]#
-#
-		df.tmp.RT.correct <- as.data.frame(data[data$correct01 == 1, ] %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(aveRT = mean(eval(parse(text = RTCol)), na.rm=T), medianRT = median(eval(parse(text = RTCol)), na.rm=T), n =sum(!is.na(correct01)) ) )#
-#
-		df.tmp.RT.correct <- df.tmp.RT.correct[df.tmp.RT.correct$n > minNperOverlap,]#
-#
-		pHVOFit <- chutils::ch.pHVOfit(df.tmp.pHVO[[overlapRoundCol]], df.tmp.pHVO$pHit)
-df.tmp.pHVO$fit <- predict(pHVOFit)
-df.tmp.pHVO$fit <- fitted(pHVOFit)
-df.tmp.pHVO$fit
-pHVOFit
-df.tmp.pHVO$fit <- fitted(pHVOFit[["nlsObject"]])
-df.tmp.pHVO
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)
-regFits$pHVOdat
-regFits$pHVOdat$fit
-regFits$pHVOdat[["fit"]]
-regFits$pHVOdat["fit"]
-regFits$RTdat
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-regFits <-ch.getPredictedRTpHVOfit(df.out4, "keybRT", overlapRoundCol = "overlapRound", correctCol = "correct", correctVals = c(1,0),  minNperOverlap = params$minOverlapN)#
-#
-  out.rss <- getMinR2RRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE)#
-  out.BIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "BIC")#
-  out.AIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "AIC")
+source("runAnalysis.r")
+source("runAnalysis.r")
+source("runAnalysis.r")
+source("runAnalysis.r")
+source("runAnalysis.r")
+source("runAnalysis.r")
+wd1 <- getwd()#
+library(devtools)#
+library(roxygen2)#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/chutils")#
+document()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages")#
+install.packages("chutils", repos = NULL, type = "source")#
+library("chutils")#
+setwd(wd1)
+source("runAnalysis.r")
+plot.new()#
+						text(x=.1, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.3, y=.9, "Removed From", font=2, cex=3)#
+						text(x=.1, y=.9, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x=.1, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.3, y=.9, "Removed From", font=2, cex=3)#
+						text(x=.4, y=.9, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x=.1, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.1, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.1, y=.5, "The Final Dataset", font=2, cex=3)
+text(x=.2, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.2, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.2, y=.5, "The Final Dataset", font=2, cex=3)
+text(x=.2, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.2, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.2, y=.5, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x=.2, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.2, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.2, y=.5, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x=.3, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.3, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.3, y=.5, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x=.4, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.4, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.4, y=.5, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x=.4, y=.9, "The Participants", font=2, cex=3)#
+						text(x=.4, y=.7, "Removed From", font=2, cex=3)#
+						text(x=.4, y=.5, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x= .4, y=.9, "The Participants", font=2, cex=3)#
+						text(x= .4, y=.7, "Removed From", font=2, cex=3)#
+						text(x= .4, y=.5, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x= .4, y=.9, "The Participants", font=2, cex=3)#
+						text(x= .4, y=.6, "Removed From", font=2, cex=3)#
+						text(x= .4, y=.4, "The Final Dataset", font=2, cex=3)
+plot.new()#
+						text(x= .4, y=.9, "The Participants", font=2, cex=3)#
+						text(x= .4, y=.6, "Removed From", font=2, cex=3)#
+						text(x= .4, y=.3, "The Final Dataset", font=2, cex=3)
+wd1 <- getwd()#
+library(devtools)#
+library(roxygen2)#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/chutils")#
+document()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages")#
+install.packages("chutils", repos = NULL, type = "source")#
+library("chutils")#
+setwd(wd1)
+source("runAnalysis.r")
+wd1 <- getwd()#
+library(devtools)#
+library(roxygen2)#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/chutils")#
+document()#
+setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages")#
+install.packages("chutils", repos = NULL, type = "source")#
+library("chutils")#
+setwd(wd1)
+source("runAnalysis.r")
+source("runAnalysis.r")
+source("runAnalysis.r")
+df.grpIdx <- data.frame(cond = c("a", "b"), idx = seq(1,2, 1))
+df.grpIdx
+fitFileName <- list.files("./", pattern="*Fitted*", full.names=TRUE)#
+	df.RRWout <- read.table(fitFileName, header=T, sep="\t")
+df.RRWout
+source("../modelspecs_HealthVarNum.r")
 library(RRW)
-out.rss <- getMinR2RRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE)#
-  out.BIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "BIC")#
-  out.AIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE, ICtype = "AIC")
-regFits$pHVOdat["fit"]
-regFits$pHVOdat["pHVO"]
-regFits$RTdat["fit"]
-regFits$RTdat["aveRT"]
-out.rss <- getMinR2RRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], equalizeRTandPhit = TRUE)
-pars.n <- 2#
-  out.BIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], pars.n, equalizeRTandPhit = TRUE, ICtype = "BIC")#
-  out.AIC <- getICRRW(regFits$pHVOdat["fit"], regFits$pHVOdat["pHVO"], regFits$RTdat["fit"],regFits$RTdat["aveRT"], pars.n, equalizeRTandPhit = TRUE, ICtype = "AIC")
-out.BIC
-out.rss <- getMinR2RRW(as.numeric(regFits$pHVOdat["fit"]), as.numeric(regFits$pHVOdat["pHVO"]), as.numeric(regFits$RTdat["fit"]),as.numeric(regFits$RTdat["aveRT"]), equalizeRTandPhit = TRUE)
-out.rss <- getMinR2RRW(unlist(regFits$pHVOdat["fit"]), unlist(regFits$pHVOdat["pHVO"]), unlist(regFits$RTdat["fit"]), unlist(regFits$RTdat["aveRT"]), equalizeRTandPhit = TRUE)
-out.rss
-regFits$pHVOdat["fit"]
-as.vector(regFits$pHVOdat["fit"])
-unlist(regFits$pHVOdat["fit"])
-out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat["fit"]), as.vector(regFits$pHVOdat["pHVO"]), as.vector(regFits$RTdat["fit"]), as.vector(regFits$RTdat["aveRT"]), equalizeRTandPhit = TRUE)
-regFits$pHVOdat$fit
-regFits$pHVOdat$fit[1]
-regFits$pHVOdat$fit[]
-regFits$pHVOdat$fit[,1]
-as.vector(regFits$pHVOdat$fit)
-out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit), as.vector(regFits$RTdat$aveRT), equalizeRTandPhit = TRUE)
-out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit), as.vector(regFits$RTdat$aveRT), equalizeRTandPhit = TRUE)#
-  pars.n <- 2#
-  out.BIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "BIC")#
-  out.AIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "AIC")
-out.rss
-out.BIC
-names(regFits)
-regFits$RTfit
-regFits$RTfit$rsquare
-summary(regFits$RTfit)
-regFits$pHVOR2
-regFits$pHVOdat
-with(regFits$pHVOdat, plot(pHVO~overlapRound))
-with(regFits$pHVOdat, points(fit~overlapRound, pch=16))
-df.tmp.pHVO <- as.data.frame(data %>% dplyr::group_by_(overlapRoundCol) %>% dplyr::summarise(pHVO = mean(correct01, na.rm=T), n =sum(!is.na(correct01)) ) )
-df.tmp.pHVO
-nrow(df.out3)
-nrow(df.out4)
-params$lowRTthreshold
-params$highRTthreshold
-params$chanceThreshold
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-source("chyTest1.r")
-regFits$pHVOdat
-regFits
-with(regFits$pHVOdat, plot(pHVO~overlapRound))
-df.over
-head(df.out3)
-with(regFits$pHVOdat, plot(rt~overlapRound))
-with(regFits$rtdat, plot(aveRT~overlapRound))
-regFits$rtdat
-regFits$RTdat
-with(regFits$RTdat, plot(aveRT~overlapRound))
-with(regFits$RTdat, plot(pHVO~overlapRound))
-with(regFits$pHVOdat, plot(pHVO~overlapRound))
-with(regFits$pHVOdat, plot(pHVO~overlapRound, ylim=c(0,1)))
-with(regFits$pHVOdat, points(fit~overlapRound, pch=16))
-source("chyTest1.r")
-head(df.out3)
-df.out3 <- ch.mergeChoiceDataWithOverlapsData(df.out2, df.over, "overlap", "direction", "keyDef", respChoiceVal = c("Donate", "Keep"), item1cols = c("Item"), item2cols = c("ref_holder"), overlapItem1cols = c("IA1"), overlapItem2cols = c("IB1"),outfile = "testMerge.txt", roundThreshold = 0.1, roundDirection = ceiling)
-head(df.out3)
-df.over
-with(regFits$pHVOdat, plot(pHVO~overlapRound, ylim=c(0,1)))
-source("chyTest1.r")
-regFits
-nrow(df.out3)
-nrow(df.out4)
-.05* 26259
-.05* 26259 + 197
-24750 + 1509
-with(regFits$pHVOdat, plot(pHVO~overlapRound, ylim=c(0,1)))
-with(regFits$pHVOdat, points(fit~overlapRound, pch=16))
-with(regFits$RTdat, plot(aveRT~overlapRound))
-out.rss
-out.rss <- getMinR2RRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit), as.vector(regFits$RTdat$aveRT), equalizeRTandPhit = TRUE)#
-  pars.n <- 3#
-  out.BIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "BIC")#
-  out.AIC <- getICRRW(as.vector(regFits$pHVOdat$fit), as.vector(regFits$pHVOdat$pHVO), as.vector(regFits$RTdat$fit),as.vector(regFits$RTdat$aveRT), pars.n, equalizeRTandPhit = TRUE, ICtype = "AIC")
-out.BIC
-summary(regFits$RTfit)
-head(df.out2)
-xx<- unique(df.out2[,c("Item", "ref_holder")])
-xx
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-ch.getPrompts(df.out3, item1cols = c("Item"), item2cols = c("ref_holder"))
-head(df.over)
-?seq
-seq("IA1", "IA3", 1)
-paste("IA"), seq(1,3,1)
-paste("IA", seq(1,3,1))
-paste("IA", seq(1,3,1), sep="")
-xx <- paste("IA", seq(1,3,1), sep="")
-length(xx)
-xx
-unloadNamespace("RRW")
+source("../modelspecs_HealthVarNum.r")
+modelNames <- names(allModels)
+modelNames
+allModels[[modelName[4]]]
+allModels[[modelNames[4]]]
+rrwModelList <- allModels[[modelNames[4]]]
+rrwModelList
+grpCols <- unique(as.vector(unlist(lapply(unlist(rrwModelList, recursive=FALSE), `[`, "GroupByVariables"))))
+grpCols
+nGrpsCols <- length(grpCols)#
+    #for each group#
+    for (i in grpCols) {#
+      #if it is the first group#
+      if(i == grpCols[1]) {#
+        #initiate the variable#
+        df.RRWout$cond <- df.RRWout[[i]]#
+      } else {#
+        #otherise, just add values to the variable#
+        df.RRWout$cond <- paste(df.RRWout$cond, df.RRWout[[i]], sep="-")#
+      }
+}
+df.RRWout$cond
+df.RRWout[[i]]
+i = 1
+i = grpCols[1
+]
+i
+tmpConds <- unique(df.RRWout[[i]])
+tmpConds
+head(df.RRWout)
+tmpConds
+j = tmpCond[1]
+j = tmpConds[1]
+j
+df.RRWout[df.RRWout[[i]] == j,]
+data <- df.RRWout#
+	condCol ="cond"
+conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+maxIntensityChanges <- 4#
+maxHueChanges <- 4
+conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+df.legend
+pch()
+?pch
+if(!is.null(grpCols)) {#
+    #how many grouping variables#
+    nGrpsCols <- length(grpCols)#
+    #for each group#
+    for (i in grpCols) {#
+      #if it is the first group#
+      if(i == grpCols[1]) {#
+        #initiate the variable#
+        df.RRWout$cond <- df.RRWout[[i]]#
+      } else {#
+        #otherise, just add values to the variable#
+        df.RRWout$cond <- paste(df.RRWout$cond, df.RRWout[[i]], sep=";")#
+      }#
+    }#
+  }#
+	data <- df.RRWout#
+	condCol ="cond"#
+maxIntensityChanges <- 4#
+maxHueChanges <- 4#
+    if(!is.null(condCol)) {#
+      conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", idx = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+df.legend
+if(!is.null(grpCols)) {#
+    #how many grouping variables#
+    nGrpsCols <- length(grpCols)#
+    #for each group#
+    for (i in grpCols) {#
+      #if it is the first group#
+      if(i == grpCols[1]) {#
+        #initiate the variable#
+        df.RRWout$cond <- df.RRWout[[i]]#
+      } else {#
+        #otherise, just add values to the variable#
+        df.RRWout$cond <- paste(df.RRWout$cond, df.RRWout[[i]], sep="::")#
+      }#
+    }#
+  }
+if(!is.null(condCol)) {#
+      conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", idx = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+df.legend
+data <- df.RRWout#
+	condCol ="cond"#
+maxIntensityChanges <- 4#
+maxHueChanges <- 4#
+    if(!is.null(condCol)) {#
+      conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", idx = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+df.legend
+df.grpIdx
+data <- df.RRWout#
+	condCol ="cond"#
+maxIntensityChanges <- 4#
+maxHueChanges <- 4#
+    if(!is.null(condCol)) {#
+      conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, idx = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", idx = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+conds
+names(df.grpIndex)
+names(df.grpIdx)
+df.grpIndex <- df.grpIdx
+grpCols <- names(df.grpIndex)#
+    #remove the index number column#
+    grpCols <- grpCols[grpCols !="indexNum"]#
+    nGrps <- length(grpCols)#
+    #use only the first two columns#
+    if(nGrps > 2) {#
+      grpCols <- grpCols[1:2]#
+      nGrps <- 2#
+    }
+grpCols
+#create a dataframe with the group names and number of levels#
+    df.grpInfo <- NULL#
+    nLevels <- NULL#
+    for(i in 1:nGrps){#
+      df.grpInfo$nLevels[i] <- length(unique(df.grpIndex[,grpCols[i]]))#
+      df.grpInfo$grpName[i] <- grpCols[i]#
+    }#
+    df.grpInfo <- data.frame(df.grpInfo)#
+    #sort by number of levels#
+    df.grpInfo <- df.grpInfo[order(df.grpInfo$nLevels),]
+df.grpInfo
+lineTypes <- ch.get67diffLtys()#
+    hsvCols <- ch.getHSVcolors(df.grpInfo$nLevels[1], maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+hsvCols
+ch.getHSVcolors(df.grpInfo$nLevels[1], maxIntensityChanges = 3, maxHueChanges = 3)
+sort(as.character(unique(df.grpIndex[,as.character(df.grpInfo$grpName[i])])))
+tmpDF[[as.character(df.grpInfo$grpName[i])]] <- gLevels
+gLevels <- sort(as.character(unique(df.grpIndex[,as.character(df.grpInfo$grpName[i])])))#
+      tmpDF[[as.character(df.grpInfo$grpName[i])]] <- gLevels
+tmpDF <- list()#
+      #sort group names so the same legend values are used across experiments#
+      gLevels <- sort(as.character(unique(df.grpIndex[,as.character(df.grpInfo$grpName[i])])))#
+      tmpDF[[as.character(df.grpInfo$grpName[i])]] <- gLevels
+tmpDF
+for(j in 1:df.grpInfo$nLevels[i]) {#
+        if(i == 2) {#
+          #the group with the most levels gets a variation in line type#
+          tmpDF$lty[j] <- lineTypes[j]#
+        }#
+        if(i == 1) {#
+          tmpDF$h[j] <- hsvCols$h[j]#
+          tmpDF$s[j] <- hsvCols$s[j]#
+          tmpDF$v[j] <- hsvCols$v[j]#
+#
+        }
+tmpDF
+}
+tmpDF
+tmpDF <- data.frame(tmpDF)#
+      df.levelLgnd[[as.character(df.grpInfo$grpName[i])]] <- tmpDF
+df.levelLgnd <- list()
+tmpDF <- data.frame(tmpDF)#
+      df.levelLgnd[[as.character(df.grpInfo$grpName[i])]] <- tmpDF
+tmpDF
+df.grpIndex
+?ch.subsetDFbyGroups
+ch.subsetDFbyGroups(data, grpCols)
+ch.subsetDFbyGroups(df.RRWout, grpCols)
+grpCols
+grpCols <- NULL#
+  #try as a nested list first#
+  tryCatch ({#
+    grpCols <- unique(as.vector(unlist(lapply(unlist(rrwModelList, recursive=FALSE), `[`, "GroupByVariables"))))#
+    }, error = function(e) {}#
+  )
+ch.subsetDFbyGroups(df.RRWout, grpCols)
+data <- df.RRWout#
+	condCol ="cond"#
+maxIntensityChanges <- 4#
+maxHueChanges <- 4#
+    if(!is.null(condCol)) {#
+      conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", indexNum = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }#
+	df.grpIndex <- df.grpIdx
+df.legend
+df.grpIdx
+xx <- ch.subsetDFbyGroups(df.RRWout, grpCols)
+xx$dfIndex
+chutils::ch.getPlotLegendVals(xx$dfIndex, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+grpCols
+dataRtCol#
+	dataPhitCol#
+	rtFitCol#
+	pHitFitCol#
+	correctCol#
+	overlapCol#
+	condCol =c("symptomQuantity","Set2")
+dataRtCol = "rt"#
+	dataPhitCol = "pHit"#
+	rtFitCol = "rtFit"#
+	pHitFitCol = "pCross"#
+	correctCol = "correct"#
+	overlapCol = "overlap", #
+	condCol ="cond"#
+	condCol =c("symptomQuantity","Set2")
+dataRtCol = "rt"#
+	dataPhitCol = "pHit"#
+	rtFitCol = "rtFit"#
+	pHitFitCol = "pCross"#
+	correctCol = "correct"#
+	overlapCol = "overlap"#
+	condCol ="cond"#
+	condCol =c("symptomQuantity","Set2")
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("withSims-",i,"-",j, plotFilename, sep=""), yMinMixRT=yMinMixRT, numSimsToPlot=numSimsToPlot, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("withSims-",i,"-",j, plotFilename, sep=""), numSimsToPlot=numSimsToPlot, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+yMinMixRT <- chutils::ch.getPlotAxisMinMax(df.RRWout[[dataRtCol]])
+plotRRWFit2(df.RRWout[df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+unloadNamespace("RRW")#
 ch.updateRpackage (packageName = "RRW")
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol =condCol,  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+multiplePlotsPerPage = TRUE
+if (multiplePlotsPerPage == TRUE) {#
+      op <- par(mfrow=c(2,2),bty="n", font=1, family='serif', mar=c(2,2,2,2), oma=c(2,2,2,2), cex=1.25, las=1)#
+    } else {#
+      op <- par(mfrow=c(1,1), bg="white",  bty="n", font=2, family='serif', mar=c(5,6,4,10), las=1, cex=1)#
+      if (!is.null(plotFilename)) {#
+        pdf(plotFilename, width=10, height=8 )#
+      }#
+    }#
+    lwd <- 2#
+    pchTmp <- 21#
+    simGrey <- 0.95#
+    pointCEXsize <- 0.7
+#set up plot axes#
+    if(is.null(yMinMixRT)) {#
+      yMinMixRT <- chutils::ch.getPlotAxisMinMax(data[[dataRtCol]])#
+    }#
+    if(is.null(xMinMax)) {#
+      minX <- ifelse(min(data[[overlapCol]]) < 0, min(data[[overlapCol]]), 0)#
+      maxX <- ifelse(max(data[[overlapCol]]) > 1, max(data[[overlapCol]]), 1.0)#
+      xLims <- c(minX, maxX)#
+    } else {#
+      xLims <- xMinMax#
+    }
+yMinMixY
+yMinMixY <- yMinMixRT
+#set up plot axes#
+    if(is.null(yMinMixRT)) {#
+      yMinMixRT <- chutils::ch.getPlotAxisMinMax(data[[dataRtCol]])#
+    }#
+    if(is.null(xMinMax)) {#
+      minX <- ifelse(min(data[[overlapCol]]) < 0, min(data[[overlapCol]]), 0)#
+      maxX <- ifelse(max(data[[overlapCol]]) > 1, max(data[[overlapCol]]), 1.0)#
+      xLims <- c(minX, maxX)#
+    } else {#
+      xLims <- xMinMax#
+    }
+xMinMax = NULL
+#set up plot axes#
+    if(is.null(yMinMixRT)) {#
+      yMinMixRT <- chutils::ch.getPlotAxisMinMax(data[[dataRtCol]])#
+    }#
+    if(is.null(xMinMax)) {#
+      minX <- ifelse(min(data[[overlapCol]]) < 0, min(data[[overlapCol]]), 0)#
+      maxX <- ifelse(max(data[[overlapCol]]) > 1, max(data[[overlapCol]]), 1.0)#
+      xLims <- c(minX, maxX)#
+    } else {#
+      xLims <- xMinMax#
+    }
+if(!is.null(condCol)) {#
+      conds <- unique(data[[condCol]])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", indexNum = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+condCol
+conds
+conds <- unique(data[[condCol]])
+condCol
+unique(data[, condCol])
+if(!is.null(condCol)) {#
+#      conds <- unique(data[[condCol]])#
+      conds <- unique(data[, condCol])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", indexNum = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+df.grpIdx
+df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="conds",  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+unloadNamespace("RRW")#
 ch.updateRpackage (packageName = "RRW")
-unloadNamespace("chMorals")
-ch.updateRpackage (packageName = "chMorals")
-r_out <- rrwAssessComparisonDistribitionFit <- function (df.out2, df.valueDat, refDistN = median(valueStats$N), refDistMean = median(valueStats$valueMedian), refDistSD = median(valueStats$valueSD), item1cols = c("Item"), item2cols = c("ref_holder"), respChoiceCol = "keyDef", respChoiceVal = c("Donate", "Keep"), RTCol = resCol, chanceThreshold = params$chanceThreshold, lowRTquantileThreshold = params$lowRTthreshold, highRTquantileThreshold = params$highRTthreshold, minOverlapN = params$minOverlapN, pars.n = 3, equalizeRTandPhit = TRUE, minimizeStat = "BIC", roundThreshold = 0.1, roundDirection = ceiling, overlapNumRuns = 1000, combFun = ch.maxAveComb, probMax = 0.5)
-)))
-wd <- getwd()#
-setwd("~/Dropbox/UNCW/Active UNCW/research/Programming/R Packages/RRW")
-use_package("chMorals") # Defaults to imports
-use_package("chValues") # Defaults to imports
-unloadNamespace("RRW")
-unloadNamespace("chMorals")
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="conds",  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+plotRRWFit2(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol ="cond",  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+data.frame(cond = conds, indexNum = seq(1,conds.n, 1))
+data.frame(cond = conds, indexNum = seq(1,conds.n, 1))      conds <- unique(data[, condCol])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- conds#
+      df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+conds <- unique(data[, condCol])#
+      conds.n <- length(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- conds#
+      df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+conds
+conds.n
+conds <- unique(data[, condCol])#
+      conds.n <- nrow(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- conds#
+      df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+df.legend
+conds <- unique(data[, "cond"])
+conds
+conds.n <- nrow(conds)#
+      #create plot info and legend info#
+      df.grpIdx <- conds#
+      df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+df.grpIdx
+as.data.frame(unique(data[, "conds"]))
+as.data.frame(unique(data[, "cond"]))
+unique(data[, "cond"])
+length(condCol)
+unloadNamespace("RRW")#
 ch.updateRpackage (packageName = "RRW")
-ch.updateRpackage (packageName = "chMorals")
+plotRRWFit3(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol =condCol,  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+condCol
+condCol
+plotRRWFit3(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol =condCol,  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+#get conditions and number of conditions#
+    if(!is.null(condCol)) {#
+      if(length(condCol) > 1) {#
+        conds <- unique(data[, condCol])#
+        conds.n <- nrow(conds)#
+        df.grpIdx <- conds#
+        df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      } else {#
+        conds <- unique(data[[condCol]])#
+        conds.n <- length(conds)#
+        df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))#
+      }#
+      #create plot info and legend info#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)
+df.legend
+}
+conds.n
+conds
+conds[1]
+conds[1, ]
+condCol
+condCol[1]
+cnd <- condCol[1]
+cnd
+cnd <- 1
+conds[cnd,i]
+i <- condCol[1]
+conds[cnd,i]
+df.tmp <- data
+x <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol], ]
+cndCol <- i
+x <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol], ]
+x
+for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol], ]#
+          }
+df.tmp
+df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]], ]#
+          }
+df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]#
+          }
+df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]#
+          }
+df.tmp
+data
+unloadNamespace("RRW")#
+ch.updateRpackage (packageName = "RRW")
+unloadNamespace("RRW")#
+ch.updateRpackage (packageName = "RRW")
+plotRRWFit3(df.RRWout, dataRtCol, dataPhitCol,  rtFitCol, pHitFitCol, correctCol, overlapCol, condCol =condCol,  plotFilename = paste("tmp.pdf"), yMinMixRT=yMinMixRT, numSimsToPlot=40, maxIntensityChanges = 4, maxHueChanges = 4)
+if (multiplePlotsPerPage == TRUE) {#
+      op <- par(mfrow=c(2,2),bty="n", font=1, family='serif', mar=c(2,2,2,2), oma=c(2,2,2,2), cex=1.25, las=1)#
+    } else {#
+      op <- par(mfrow=c(1,1), bg="white",  bty="n", font=2, family='serif', mar=c(5,6,4,10), las=1, cex=1)#
+      if (!is.null(plotFilename)) {#
+        pdf(plotFilename, width=10, height=8 )#
+      }#
+    }#
+    lwd <- 2#
+    pchTmp <- 21#
+    simGrey <- 0.95#
+    pointCEXsize <- 0.7#
+  #set up plot axes#
+    if(is.null(yMinMixRT)) {#
+      yMinMixRT <- chutils::ch.getPlotAxisMinMax(data[[dataRtCol]])#
+    }#
+    if(is.null(xMinMax)) {#
+      minX <- ifelse(min(data[[overlapCol]]) < 0, min(data[[overlapCol]]), 0)#
+      maxX <- ifelse(max(data[[overlapCol]]) > 1, max(data[[overlapCol]]), 1.0)#
+      xLims <- c(minX, maxX)#
+    } else {#
+      xLims <- xMinMax#
+    }#
+  #get conditions and number of conditions#
+    if(!is.null(condCol)) {#
+      if(length(condCol) > 1) {#
+        conds <- unique(data[, condCol])#
+        conds.n <- nrow(conds)#
+        df.grpIdx <- conds#
+        df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      } else {#
+        conds <- unique(data[[condCol]])#
+        conds.n <- length(conds)#
+        df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))#
+      }#
+      #create plot info and legend info#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", indexNum = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }
+#create empty plot for p(HVO)#
+    plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)#
+#
+    abline(a=0.5,b=0,col="grey", lwd=2)
+if(numSimsToPlot > 0) {#
+      for(cnd in 1:conds.n) {#
+        if(!is.null(condCol)) {#
+          df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]#
+          }#
+        } else {#
+          df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]#
+        }#
+        plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])#
+        lty <- df.legend[cnd,"lty"]#
+#
+        #add background Simulation lines#
+          for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }#
+        }#
+      }
+numSimsToPlot=40
+if(numSimsToPlot > 0) {#
+      for(cnd in 1:conds.n) {#
+        if(!is.null(condCol)) {#
+          df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]#
+          }#
+        } else {#
+          df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]#
+        }#
+        plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])#
+        lty <- df.legend[cnd,"lty"]#
+#
+        #add background Simulation lines#
+          for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }#
+        }#
+      }
+df.tmp[,overlapCol]
+df.tmp[, paste(pHitFitCol,i,sep="")]
+if(numSimsToPlot > 0) {#
+      for(cnd in 1:conds.n) {#
+        if(!is.null(condCol)) {#
+          df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]#
+          }#
+        } else {#
+          df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]#
+        }#
+        plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])#
+        lty <- df.legend[cnd,"lty"]#
+#
+        #add background Simulation lines#
+          for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }#
+        }#
+      }
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)#
+#
+    abline(a=0.5,b=0,col="grey", lwd=2)#
+#
+    if(numSimsToPlot > 0) {#
+      for(cnd in 1:conds.n) {#
+        if(!is.null(condCol)) {#
+          df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]#
+          }#
+        } else {#
+          df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]#
+        }#
+        plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])#
+        lty <- df.legend[cnd,"lty"]#
+#
+        #add background Simulation lines#
+          for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }#
+        }#
+      }
+#set up plot parameters#
+    if (multiplePlotsPerPage == TRUE) {#
+      op <- par(mfrow=c(2,2),bty="n", font=1, family='serif', mar=c(2,2,2,2), oma=c(2,2,2,2), cex=1.25, las=1)#
+    } else {#
+      op <- par(mfrow=c(1,1), bg="white",  bty="n", font=2, family='serif', mar=c(5,6,4,10), las=1, cex=1)#
+      if (!is.null(plotFilename)) {#
+        pdf(plotFilename, width=10, height=8 )#
+      }#
+    }#
+    lwd <- 2#
+    pchTmp <- 21#
+    simGrey <- 0.95#
+    pointCEXsize <- 0.7#
+  #set up plot axes#
+    if(is.null(yMinMixRT)) {#
+      yMinMixRT <- chutils::ch.getPlotAxisMinMax(data[[dataRtCol]])#
+    }#
+    if(is.null(xMinMax)) {#
+      minX <- ifelse(min(data[[overlapCol]]) < 0, min(data[[overlapCol]]), 0)#
+      maxX <- ifelse(max(data[[overlapCol]]) > 1, max(data[[overlapCol]]), 1.0)#
+      xLims <- c(minX, maxX)#
+    } else {#
+      xLims <- xMinMax#
+    }#
+  #get conditions and number of conditions#
+    if(!is.null(condCol)) {#
+      if(length(condCol) > 1) {#
+        conds <- unique(data[, condCol])#
+        conds.n <- nrow(conds)#
+        df.grpIdx <- conds#
+        df.grpIdx$indexNum <- seq(1,conds.n, 1)#
+      } else {#
+        conds <- unique(data[[condCol]])#
+        conds.n <- length(conds)#
+        df.grpIdx <- data.frame(cond = conds, indexNum = seq(1,conds.n, 1))#
+      }#
+      #create plot info and legend info#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    } else {#
+      conds.n <- 1#
+      df.grpIdx <- data.frame(cond = "all", indexNum = c(1))#
+      df.legend <- chutils::ch.getPlotLegendVals(df.grpIdx, maxIntensityChanges = maxIntensityChanges, maxHueChanges = maxHueChanges)#
+    }#
+#
+    #create empty plot for p(HVO)#
+    plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)#
+#
+    abline(a=0.5,b=0,col="grey", lwd=2)
+if(numSimsToPlot > 0) {#
+      for(cnd in 1:conds.n) {#
+        if(!is.null(condCol)) {#
+          df.tmp <- data#
+          for(cndCol in condCol) {#
+            df.tmp <- df.tmp[df.tmp[[cndCol]] == conds[cnd,cndCol] & df.tmp[[correctCol]] == TRUE & !is.na(df.tmp[[dataPhitCol]]), ]#
+          }#
+        } else {#
+          df.tmp <- data[ data[[correctCol]] == TRUE & !is.na(data[[dataPhitCol]]), ]#
+        }#
+        plotCol <- hsv(df.legend[cnd,"h"], df.legend[cnd,"s"], df.legend[cnd,"v"])#
+        lty <- df.legend[cnd,"lty"]#
+#
+        #add background Simulation lines#
+          for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }#
+        }#
+      }
+!is.null(condCol)
+condCol
+cnd
+df.tmp
+for(i in 1: numSimsToPlot) {#
++             lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
++           }
+for(i in 1: numSimsToPlot) {#
++             lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
++           }
+for(i in 1: numSimsToPlot) {#
++             lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
++           }
+i
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(50), lty="solid", lwd = 1)
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(0.5), lty="solid", lwd = 1)
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(0.5), lty="solid", lwd = 1)
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(0.5), lty="solid", lwd = 1)
+lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)
+for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }
+points(df.tmp[[overlapCol]], df.tmp[[dataPhitCol]], col=plotCol, pch=pchTmp, bg = plotCol, cex=pointCEXsize)#
+        lines(df.tmp[[overlapCol]], df.tmp[[pHitFitCol]], col=plotCol, lty=lty, lwd = lwd)
+df.tmp[,overlapCol]
+df.tmp[, paste(pHitFitCol,i,sep="")]
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+op <- par(mfrow=c(2,2),bty="n", font=1, family='serif', mar=c(2,2,2,2), oma=c(2,2,2,2), cex=1.25, las=1)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,2), xlim = xLims, xlab = NULL, ylab= NA)
+plot(NA, ylim=c(0,1), xlim = xLims, xlab = NULL, ylab= NA)
+for(i in 1: numSimsToPlot) {#
+            lines(df.tmp[,overlapCol], df.tmp[, paste(pHitFitCol,i,sep="")], col=gray(simGrey), lty="solid", lwd = 1)#
+          }

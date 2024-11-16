@@ -104,6 +104,16 @@ getMeanRRWfit <- function(data, b, bcs = 0.25, Ter = 0, s=0, nSD=0, db=0, da=0.2
   df.fitted$pCross <- rowMeans(df.fitted[,simPhitCols], na.rm = TRUE)
   df.fitted[[RwSamplesCol]] <- rowMeans(df.fitted[,simSMPSCols], na.rm = TRUE)
 
+  ## remove unstable estimates: Any time less than half the simulations produced a value
+  df.Q.NAs <- which(rowMeans(!is.na(df.fitted[,simSMPSCols])) < 0.5)
+  df.pc.NAs <- which(rowMeans(!is.na(df.fitted[,simPhitCols])) < 0.5)
+  if(length(df.pc.NAs) > 0) {
+  	df.fitted[df.pc.NAs, "pCross"] <- NA
+  }
+  if(length(df.Q.NAs) > 0) {
+  	df.fitted[df.Q.NAs, RwSamplesCol] <- NA
+  }
+
   #rescale so samples fits rts
   Q50.lm <- lm(df.fitted[[dataRtCol]]~df.fitted[[RwSamplesCol]])
   df.fitted$rtFit = df.fitted[[RwSamplesCol]]*coef(Q50.lm)[2]+coef(Q50.lm)[1]
